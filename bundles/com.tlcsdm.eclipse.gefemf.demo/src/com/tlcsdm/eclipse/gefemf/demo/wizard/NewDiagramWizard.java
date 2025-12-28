@@ -59,7 +59,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
     @Override
     public boolean performFinish() {
         String fileName = page.getFileName();
-        IResource container = page.getContainer();
+        IResource container = page.getSelectedContainer();
 
         if (container == null || !(container instanceof IFolder || container instanceof IProject)) {
             return false;
@@ -186,7 +186,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
             return fileNameText.getText();
         }
 
-        public IResource getContainer() {
+        public IResource getSelectedContainer() {
             return container;
         }
     }

@@ -7,8 +7,6 @@
 package com.tlcsdm.eclipse.gefemf.demo.palette;
 
 import org.eclipse.gef.ui.palette.PaletteViewer;
-import org.eclipse.gef.ui.palette.PaletteViewerProvider;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -23,8 +21,8 @@ public class PaletteView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        PaletteViewerProvider provider = new PaletteViewerProvider(getSite().getWorkbenchWindow().getActivePage());
-        paletteViewer = provider.createPaletteViewer(parent);
+        paletteViewer = new PaletteViewer();
+        paletteViewer.createControl(parent);
         paletteViewer.setPaletteRoot(DiagramPaletteFactory.createPalette());
     }
 
