@@ -30,7 +30,7 @@ mvn clean verify
 ## 开发环境
 
 - Java 21
-- Eclipse 2024-09 or later
+- Eclipse 2025-03 or later
 - Maven 3.9.0+
 
 ## 许可证
