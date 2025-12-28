@@ -8,6 +8,8 @@ package com.tlcsdm.eclipse.gefemf.demo.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -25,7 +27,15 @@ public abstract class ModelElement implements Serializable {
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_CONNECTION = "connection";
 
-    private final transient PropertyChangeSupport listeners = new PropertyChangeSupport(this);
+    private transient PropertyChangeSupport listeners = new PropertyChangeSupport(this);
+
+    /**
+     * Restore the PropertyChangeSupport after deserialization.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        listeners = new PropertyChangeSupport(this);
+    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         listeners.addPropertyChangeListener(listener);

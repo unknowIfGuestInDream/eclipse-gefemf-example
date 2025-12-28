@@ -13,18 +13,18 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Figure representing a class node in UML style.
  */
 public class ClassNodeFigure extends Figure {
 
-    private static final Color CLASS_HEADER_BG = new Color(Display.getDefault(), 200, 220, 255);
-    private static final Color CLASS_BODY_BG = new Color(Display.getDefault(), 240, 245, 255);
+    // Use system colors that are managed by Eclipse (ColorConstants uses system colors internally)
+    private static final Color CLASS_HEADER_BG = ColorConstants.lightBlue;
+    private static final Color CLASS_BODY_BG = ColorConstants.white;
 
     private Label nameLabel;
     private Figure attributeCompartment;
@@ -39,7 +39,7 @@ public class ClassNodeFigure extends Figure {
         setBackgroundColor(CLASS_BODY_BG);
         setOpaque(true);
 
-        // Class name header
+        // Class name header - use JFace managed fonts
         nameLabel = new Label("Class");
         nameLabel.setFont(getBoldFont());
         nameLabel.setBackgroundColor(CLASS_HEADER_BG);
@@ -59,8 +59,11 @@ public class ClassNodeFigure extends Figure {
         add(methodCompartment);
     }
 
+    /**
+     * Get a bold font from JFaceResources (managed font, no disposal needed).
+     */
     private Font getBoldFont() {
-        return new Font(Display.getDefault(), "Arial", 10, SWT.BOLD);
+        return JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
     }
 
     public void setClassName(String name) {
