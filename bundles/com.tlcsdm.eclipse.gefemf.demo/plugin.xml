@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="com.tlcsdm.eclipse.gefemf.demo.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="GEF EMF Demo"
+            class="com.tlcsdm.eclipse.gefemf.demo.Perspective"
+            id="com.tlcsdm.eclipse.gefemf.demo.perspective">
+      </perspective>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="com.tlcsdm.eclipse.gefemf.demo.application"
+            name="Eclipse GEF EMF Demo">
+         <property
+               name="appName"
+               value="Eclipse GEF EMF Demo">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/sample.png">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="GEF EMF Demo"
+            id="com.tlcsdm.eclipse.gefemf.demo.category">
+      </category>
+      <view
+            category="com.tlcsdm.eclipse.gefemf.demo.category"
+            class="com.tlcsdm.eclipse.gefemf.demo.palette.PaletteView"
+            id="com.tlcsdm.eclipse.gefemf.demo.paletteView"
+            name="Palette"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditor"
+            default="true"
+            extensions="gefemf"
+            icon="icons/sample.png"
+            id="com.tlcsdm.eclipse.gefemf.demo.editor"
+            name="GEF EMF Diagram Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.tlcsdm.eclipse.gefemf.demo.category"
+            class="com.tlcsdm.eclipse.gefemf.demo.wizard.NewDiagramWizard"
+            icon="icons/sample.png"
+            id="com.tlcsdm.eclipse.gefemf.demo.wizard.newDiagram"
+            name="New Diagram File">
+      </wizard>
+      <category
+            id="com.tlcsdm.eclipse.gefemf.demo.category"
+            name="GEF EMF Demo">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="com.tlcsdm.eclipse.gefemf.demo.menus.file"
+               label="File">
+            <command
+                  commandId="org.eclipse.ui.newWizard"
+                  id="newWizard"
+                  label="New"
+                  style="push">
+            </command>
+            <separator
+                  name="separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.file.exit"
+                  id="quit"
+                  label="Exit"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="com.tlcsdm.eclipse.gefemf.demo.menus.generate"
+               label="Generate">
+            <command
+                  commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
+                  id="generateCode"
+                  label="Generate Code"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="com.tlcsdm.eclipse.gefemf.demo.menus.help"
+               label="Help">
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  id="about"
+                  label="About"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="com.tlcsdm.eclipse.gefemf.demo.toolbar">
+            <command
+                  commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
+                  icon="icons/generate.png"
+                  id="generateButton"
+                  label="Generate Code"
+                  style="push"
+                  tooltip="Generate Java Code from Diagram">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
+            name="Generate Code">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
+            class="com.tlcsdm.eclipse.gefemf.demo.handler.GenerateCodeHandler">
+      </handler>
+   </extension>
+</plugin>
