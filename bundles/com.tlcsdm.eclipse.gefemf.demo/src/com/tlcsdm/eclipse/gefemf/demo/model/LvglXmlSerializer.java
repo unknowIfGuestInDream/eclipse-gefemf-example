@@ -151,6 +151,10 @@ public class LvglXmlSerializer {
 		return widget;
 	}
 
+	/**
+	 * Format color as hex string (RGB only, alpha channel is not preserved).
+	 * LVGL basic widgets primarily use RGB colors.
+	 */
 	private String formatColor(int color) {
 		return String.format("#%06X", color & 0xFFFFFF);
 	}

@@ -81,6 +81,11 @@ public class LvglScreen extends ModelElement {
 		firePropertyChange(PROPERTY_ADD, null, widget);
 	}
 
+	public void insertWidget(int index, LvglWidget widget) {
+		widgets.add(index, widget);
+		firePropertyChange(PROPERTY_ADD, null, widget);
+	}
+
 	public void removeWidget(LvglWidget widget) {
 		widgets.remove(widget);
 		firePropertyChange(PROPERTY_REMOVE, widget, null);

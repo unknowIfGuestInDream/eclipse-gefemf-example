@@ -6,6 +6,8 @@
  ******************************************************************************/
 package com.tlcsdm.eclipse.gefemf.demo.palette;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.eclipse.gef.palette.CreationToolEntry;
 import org.eclipse.gef.palette.PaletteDrawer;
 import org.eclipse.gef.palette.PaletteRoot;
@@ -110,7 +112,7 @@ public class LvglPaletteFactory {
 	 */
 	private static class LvglWidgetFactory implements CreationFactory {
 		private final LvglWidget.WidgetType widgetType;
-		private static int counter = 0;
+		private static final AtomicInteger counter = new AtomicInteger(0);
 
 		public LvglWidgetFactory(LvglWidget.WidgetType widgetType) {
 			this.widgetType = widgetType;
@@ -118,8 +120,8 @@ public class LvglPaletteFactory {
 
 		@Override
 		public Object getNewObject() {
-			counter++;
-			String name = widgetType.name().toLowerCase() + "_" + counter;
+			int count = counter.incrementAndGet();
+			String name = widgetType.name().toLowerCase() + "_" + count;
 			LvglWidget widget = new LvglWidget(name, widgetType);
 
 			// Set default text based on widget type

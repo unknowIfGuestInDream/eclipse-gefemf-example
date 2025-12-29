@@ -157,7 +157,8 @@ public class LvglWidgetFigure extends Figure {
 		// Draw text
 		if (!text.isEmpty()) {
 			g.setForegroundColor(ColorConstants.black);
-			int textX = r.x + (r.width - text.length() * 6) / 2;
+			int textWidth = g.getFontMetrics().getAverageCharWidth() * text.length();
+			int textX = r.x + (r.width - textWidth) / 2;
 			int textY = r.y + r.height / 2;
 			g.drawString(text, textX, textY);
 		}

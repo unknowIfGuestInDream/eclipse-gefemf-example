@@ -217,6 +217,7 @@ public class LvglWidget extends ModelElement {
 	}
 
 	@Override
+	@Override
 	public EObject toEObject() {
 		// Not used for LVGL - we use XML serialization instead
 		return null;
@@ -224,8 +225,18 @@ public class LvglWidget extends ModelElement {
 
 	/**
 	 * Generate variable name for this widget in C code.
+	 * Ensures the name is a valid C identifier.
 	 */
 	public String getVariableName() {
-		return name.replaceAll("[^a-zA-Z0-9_]", "_");
+		String varName = name.replaceAll("[^a-zA-Z0-9_]", "_");
+		// C identifiers cannot start with a digit
+		if (!varName.isEmpty() && Character.isDigit(varName.charAt(0))) {
+			varName = "_" + varName;
+		}
+		// Handle empty name
+		if (varName.isEmpty()) {
+			varName = "_widget";
+		}
+		return varName;
 	}
 }

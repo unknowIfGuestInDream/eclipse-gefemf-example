@@ -39,8 +39,8 @@ public class LvglWidgetDeleteCommand extends Command {
 
 	@Override
 	public void undo() {
-		screen.getWidgets().add(index, widget);
-		screen.addWidget(widget);
+		// Insert at original index
+		screen.insertWidget(index, widget);
 	}
 
 	@Override
