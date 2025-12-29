@@ -8,7 +8,6 @@
             <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.equinox.sdk.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.equinox.core.sdk.feature.group" version="0.0.0"/>
-            <unit id="org.eclipse.equinox.p2.rcp.feature.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.equinox.p2.core.feature.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.draw2d.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.gef.feature.group" version="0.0.0"/>
@@ -19,10 +18,6 @@
             <unit id="org.eclipse.emf.codegen.ecore.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.emf.edit.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.help.feature.group" version="0.0.0"/>
-        </location>
-        <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-            <repository location="https://mirrors.aliyun.com/eclipse/justj/jres/21/updates/release/latest/"/>
-            <unit id="org.eclipse.justj.openjdk.hotspot.jre.full.stripped.feature.group" version="0.0.0"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
             <repository location="https://mirrors.aliyun.com/eclipse/cbi/updates/license/"/>

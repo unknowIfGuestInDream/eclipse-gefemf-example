@@ -2,27 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="application"
-         point="org.eclipse.core.runtime.applications">
-      <application>
-         <run
-               class="com.tlcsdm.eclipse.gefemf.demo.Application">
-         </run>
-      </application>
-   </extension>
-   <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="com.tlcsdm.eclipse.gefemf.demo.application"
-            name="Eclipse GEF EMF Demo">
-         <property
-               name="appName"
-               value="Eclipse GEF EMF Demo">
-         </property>
-      </product>
-   </extension>
-   <extension
          point="org.eclipse.ui.views">
       <category
             name="GEF EMF Demo"
