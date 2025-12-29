@@ -49,10 +49,10 @@
       <editor
             class="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditor"
             default="true"
-            extensions="gefemf"
+            extensions="gefxml"
             icon="icons/sample.png"
             id="com.tlcsdm.eclipse.gefemf.demo.editor"
-            name="GEF EMF Diagram Editor">
+            name="LVGL UI Editor">
       </editor>
    </extension>
    <extension
@@ -100,7 +100,7 @@
             <command
                   commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
                   id="generateCode"
-                  label="Generate Code"
+                  label="Generate C Code"
                   style="push">
             </command>
          </menu>
@@ -124,9 +124,9 @@
                   commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
                   icon="icons/generate.png"
                   id="generateButton"
-                  label="Generate Code"
+                  label="Generate C Code"
                   style="push"
-                  tooltip="Generate Java Code from Diagram">
+                  tooltip="Generate LVGL C Code from Diagram">
             </command>
          </toolbar>
       </menuContribution>
@@ -135,7 +135,7 @@
          point="org.eclipse.ui.commands">
       <command
             id="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
-            name="Generate Code">
+            name="Generate C Code">
       </command>
    </extension>
    <extension

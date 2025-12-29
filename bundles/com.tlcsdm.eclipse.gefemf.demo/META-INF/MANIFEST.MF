@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse GEF EMF Demo
+Bundle-Name: Eclipse LVGL UI Demo
 Bundle-SymbolicName: com.tlcsdm.eclipse.gefemf.demo;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Tlcsdm
@@ -25,4 +25,6 @@ Export-Package: com.tlcsdm.eclipse.gefemf.demo,
  com.tlcsdm.eclipse.gefemf.demo.figure,
  com.tlcsdm.eclipse.gefemf.demo.command,
  com.tlcsdm.eclipse.gefemf.demo.palette,
- com.tlcsdm.eclipse.gefemf.demo.generator
+ com.tlcsdm.eclipse.gefemf.demo.generator,
+ com.tlcsdm.eclipse.gefemf.demo.handler,
+ com.tlcsdm.eclipse.gefemf.demo.wizard
