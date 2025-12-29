@@ -21,49 +21,41 @@ import com.tlcsdm.eclipse.gefemf.demo.model.Connection;
  */
 public class DiagramPaletteFactory {
 
-    public static PaletteRoot createPalette() {
-        PaletteRoot palette = new PaletteRoot();
+	public static PaletteRoot createPalette() {
+		PaletteRoot palette = new PaletteRoot();
 
-        // Tools group
-        PaletteDrawer toolsDrawer = new PaletteDrawer("Tools");
+		// Tools group
+		PaletteDrawer toolsDrawer = new PaletteDrawer("Tools");
 
-        // Selection tool
-        SelectionToolEntry selectionTool = new SelectionToolEntry();
-        toolsDrawer.add(selectionTool);
-        palette.setDefaultEntry(selectionTool);
+		// Selection tool
+		SelectionToolEntry selectionTool = new SelectionToolEntry();
+		toolsDrawer.add(selectionTool);
+		palette.setDefaultEntry(selectionTool);
 
-        palette.add(toolsDrawer);
+		palette.add(toolsDrawer);
 
-        // Shapes group
-        PaletteDrawer shapesDrawer = new PaletteDrawer("Shapes");
+		// Shapes group
+		PaletteDrawer shapesDrawer = new PaletteDrawer("Shapes");
 
-        // Class creation tool
-        CreationToolEntry classCreation = new CreationToolEntry(
-            "Class",
-            "Create a new class",
-            new SimpleFactory(ClassNode.class),
-            null,
-            null
-        );
-        shapesDrawer.add(classCreation);
+		// Class creation tool
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		CreationToolEntry classCreation = new CreationToolEntry("Class", "Create a new class",
+				new SimpleFactory(ClassNode.class), null, null);
+		shapesDrawer.add(classCreation);
 
-        palette.add(shapesDrawer);
+		palette.add(shapesDrawer);
 
-        // Connections group
-        PaletteDrawer connectionsDrawer = new PaletteDrawer("Connections");
+		// Connections group
+		PaletteDrawer connectionsDrawer = new PaletteDrawer("Connections");
 
-        // Connection creation tool
-        ConnectionCreationToolEntry connectionTool = new ConnectionCreationToolEntry(
-            "Association",
-            "Create an association between classes",
-            new SimpleFactory(Connection.class),
-            null,
-            null
-        );
-        connectionsDrawer.add(connectionTool);
+		// Connection creation tool
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		ConnectionCreationToolEntry connectionTool = new ConnectionCreationToolEntry("Association",
+				"Create an association between classes", new SimpleFactory(Connection.class), null, null);
+		connectionsDrawer.add(connectionTool);
 
-        palette.add(connectionsDrawer);
+		palette.add(connectionsDrawer);
 
-        return palette;
-    }
+		return palette;
+	}
 }

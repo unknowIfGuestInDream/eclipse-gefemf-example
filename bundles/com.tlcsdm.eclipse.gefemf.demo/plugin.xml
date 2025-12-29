@@ -28,10 +28,6 @@
                name="appName"
                value="Eclipse GEF EMF Demo">
          </property>
-         <property
-               name="windowImages"
-               value="icons/sample.png">
-         </property>
       </product>
    </extension>
    <extension
