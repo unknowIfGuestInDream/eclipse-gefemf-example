@@ -8,8 +8,6 @@ package com.tlcsdm.eclipse.gefemf.demo.editor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.EventObject;
 
 import org.eclipse.core.resources.IFile;
@@ -25,19 +23,20 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 
-import com.tlcsdm.eclipse.gefemf.demo.editpart.DiagramEditPartFactory;
-import com.tlcsdm.eclipse.gefemf.demo.model.ClassNode;
-import com.tlcsdm.eclipse.gefemf.demo.model.Diagram;
-import com.tlcsdm.eclipse.gefemf.demo.palette.DiagramPaletteFactory;
+import com.tlcsdm.eclipse.gefemf.demo.editpart.LvglEditPartFactory;
+import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
+import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
+import com.tlcsdm.eclipse.gefemf.demo.model.LvglXmlSerializer;
+import com.tlcsdm.eclipse.gefemf.demo.palette.LvglPaletteFactory;
 
 /**
- * GEF Editor for the diagram.
+ * GEF Editor for LVGL UI design.
  */
 public class DiagramEditor extends GraphicalEditorWithPalette {
 
 	public static final String ID = "com.tlcsdm.eclipse.gefemf.demo.editor";
 
-	private Diagram diagram;
+	private LvglScreen screen;
 	private boolean isDirty = false;
 
 	public DiagramEditor() {
@@ -48,45 +47,52 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);
 		setPartName(input.getName());
-		loadDiagram();
+		loadScreen();
 	}
 
-	private void loadDiagram() {
+	private void loadScreen() {
 		IEditorInput input = getEditorInput();
 		if (input instanceof IFileEditorInput fileInput) {
 			IFile file = fileInput.getFile();
 			try {
 				if (file.exists() && file.getContents().available() > 0) {
-					try (ObjectInputStream ois = new ObjectInputStream(file.getContents())) {
-						diagram = (Diagram) ois.readObject();
+					try {
+						LvglXmlSerializer serializer = new LvglXmlSerializer();
+						screen = serializer.load(file.getContents());
 					} catch (Exception e) {
-						// File exists but couldn't read, create new diagram
-						diagram = createDefaultDiagram();
+						// File exists but couldn't read, create new screen
+						screen = createDefaultScreen();
 					}
 				} else {
-					diagram = createDefaultDiagram();
+					screen = createDefaultScreen();
 				}
 			} catch (Exception e) {
-				diagram = createDefaultDiagram();
+				screen = createDefaultScreen();
 			}
 		} else {
-			diagram = createDefaultDiagram();
+			screen = createDefaultScreen();
 		}
 	}
 
-	private Diagram createDefaultDiagram() {
-		Diagram d = new Diagram("MyDiagram");
+	private LvglScreen createDefaultScreen() {
+		LvglScreen s = new LvglScreen("main_screen");
+		s.setWidth(480);
+		s.setHeight(320);
+		s.setBgColor(0xFFFFFF);
 
-		// Add a sample class node
-		ClassNode node = new ClassNode("SampleClass");
-		node.setBounds(new Rectangle(100, 100, 150, 120));
-		node.addAttribute("id: Integer");
-		node.addAttribute("name: String");
-		node.addMethod("getId()");
-		node.addMethod("setName(name)");
-		d.addChild(node);
+		// Add a sample button widget
+		LvglWidget button = new LvglWidget("btn_ok", LvglWidget.WidgetType.BUTTON);
+		button.setBounds(new Rectangle(100, 100, 120, 50));
+		button.setText("OK");
+		s.addWidget(button);
 
-		return d;
+		// Add a sample label widget
+		LvglWidget label = new LvglWidget("lbl_title", LvglWidget.WidgetType.LABEL);
+		label.setBounds(new Rectangle(100, 30, 200, 40));
+		label.setText("LVGL UI Designer");
+		s.addWidget(label);
+
+		return s;
 	}
 
 	@Override
@@ -94,19 +100,19 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		super.configureGraphicalViewer();
 
 		GraphicalViewer viewer = getGraphicalViewer();
-		viewer.setEditPartFactory(new DiagramEditPartFactory());
+		viewer.setEditPartFactory(new LvglEditPartFactory());
 		viewer.setRootEditPart(new ScalableFreeformRootEditPart());
 	}
 
 	@Override
 	protected void initializeGraphicalViewer() {
 		GraphicalViewer viewer = getGraphicalViewer();
-		viewer.setContents(diagram);
+		viewer.setContents(screen);
 	}
 
 	@Override
 	protected PaletteRoot getPaletteRoot() {
-		return DiagramPaletteFactory.createPalette();
+		return LvglPaletteFactory.createPalette();
 	}
 
 	@Override
@@ -116,9 +122,8 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 			IFile file = fileInput.getFile();
 			try {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(baos);
-				oos.writeObject(diagram);
-				oos.close();
+				LvglXmlSerializer serializer = new LvglXmlSerializer();
+				serializer.save(screen, baos);
 
 				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 				if (file.exists()) {
@@ -127,6 +132,7 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 					file.create(bais, true, monitor);
 				}
 				isDirty = false;
+				getCommandStack().markSaveLocation();
 				firePropertyChange(PROP_DIRTY);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -156,7 +162,7 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		super.updateActions(getStackActions());
 	}
 
-	public Diagram getDiagram() {
-		return diagram;
+	public LvglScreen getScreen() {
+		return screen;
 	}
 }

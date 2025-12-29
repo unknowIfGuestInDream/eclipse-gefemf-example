@@ -8,7 +8,6 @@ package com.tlcsdm.eclipse.gefemf.demo.wizard;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -32,10 +31,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import com.tlcsdm.eclipse.gefemf.demo.model.Diagram;
+import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
+import com.tlcsdm.eclipse.gefemf.demo.model.LvglXmlSerializer;
 
 /**
- * Wizard for creating a new diagram file.
+ * Wizard for creating a new LVGL UI file.
  */
 public class NewDiagramWizard extends Wizard implements INewWizard {
 
@@ -45,7 +45,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
-		setWindowTitle("New Diagram File");
+		setWindowTitle("New LVGL UI File");
 	}
 
 	@Override
@@ -71,15 +71,16 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 				file = ((IProject) container).getFile(fileName);
 			}
 
-			// Create an empty diagram
-			Diagram diagram = new Diagram("NewDiagram");
-			diagram.setPackageName("com.example.generated");
+			// Create an empty LVGL screen
+			LvglScreen screen = new LvglScreen("main_screen");
+			screen.setWidth(480);
+			screen.setHeight(320);
+			screen.setBgColor(0xFFFFFF);
 
-			// Serialize the diagram
+			// Serialize the screen to XML
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
-			oos.writeObject(diagram);
-			oos.close();
+			LvglXmlSerializer serializer = new LvglXmlSerializer();
+			serializer.save(screen, baos);
 
 			ByteArrayInputStream source = new ByteArrayInputStream(baos.toByteArray());
 
@@ -101,7 +102,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * Wizard page for creating a new diagram file.
+	 * Wizard page for creating a new LVGL UI file.
 	 */
 	private static class NewDiagramWizardPage extends WizardPage {
 
@@ -113,8 +114,8 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 		protected NewDiagramWizardPage(IStructuredSelection selection) {
 			super("newDiagramPage");
 			this.selection = selection;
-			setTitle("New Diagram File");
-			setDescription("Create a new GEF EMF diagram file.");
+			setTitle("New LVGL UI File");
+			setDescription("Create a new LVGL UI design file (.gefxml).");
 		}
 
 		@Override
@@ -147,7 +148,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 
 			fileNameText = new Text(composite, SWT.BORDER);
 			fileNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			fileNameText.setText("diagram.gefemf");
+			fileNameText.setText("ui_screen.gefxml");
 			fileNameText.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(ModifyEvent e) {
@@ -166,8 +167,8 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 				setPageComplete(false);
 				return;
 			}
-			if (!fileName.endsWith(".gefemf")) {
-				setErrorMessage("File name must end with .gefemf extension.");
+			if (!fileName.endsWith(".gefxml")) {
+				setErrorMessage("File name must end with .gefxml extension.");
 				setPageComplete(false);
 				return;
 			}
