@@ -11,14 +11,6 @@
       </application>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            name="GEF EMF Demo"
-            class="com.tlcsdm.eclipse.gefemf.demo.Perspective"
-            id="com.tlcsdm.eclipse.gefemf.demo.perspective">
-      </perspective>
-   </extension>
-   <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product

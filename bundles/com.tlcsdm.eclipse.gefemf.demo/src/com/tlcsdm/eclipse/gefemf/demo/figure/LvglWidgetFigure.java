@@ -193,7 +193,7 @@ public class LvglWidgetFigure extends Figure {
 
 		// Draw track
 		g.setBackgroundColor(ColorConstants.green);
-		g.fillRoundRectangle(switchX, centerY - switchHeight / 2, switchWidth, switchHeight, switchHeight, switchHeight);
+		g.fillRoundRectangle(new Rectangle(switchX, centerY - switchHeight / 2, switchWidth, switchHeight), switchHeight, switchHeight);
 
 		// Draw knob
 		g.setBackgroundColor(ColorConstants.white);
