@@ -217,7 +217,6 @@ public class LvglWidget extends ModelElement {
 	}
 
 	@Override
-	@Override
 	public EObject toEObject() {
 		// Not used for LVGL - we use XML serialization instead
 		return null;
