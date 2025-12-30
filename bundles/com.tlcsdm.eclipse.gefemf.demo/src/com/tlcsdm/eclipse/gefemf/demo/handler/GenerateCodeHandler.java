@@ -20,6 +20,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditor;
+import com.tlcsdm.eclipse.gefemf.demo.editor.DiagramMultiPageEditor;
 import com.tlcsdm.eclipse.gefemf.demo.generator.LvglCodeGenerator;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
@@ -34,14 +35,20 @@ public class GenerateCodeHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEditorPart editor = HandlerUtil.getActiveEditor(event);
 
-		if (!(editor instanceof DiagramEditor)) {
+		LvglScreen screen = null;
+		IFile diagramFile = null;
+
+		if (editor instanceof DiagramMultiPageEditor multiPageEditor) {
+			screen = multiPageEditor.getScreen();
+			diagramFile = (IFile) multiPageEditor.getEditorInput().getAdapter(IFile.class);
+		} else if (editor instanceof DiagramEditor diagramEditor) {
+			screen = diagramEditor.getScreen();
+			diagramFile = (IFile) diagramEditor.getEditorInput().getAdapter(IFile.class);
+		} else {
 			ConsoleLogger.logWarning("Please open an LVGL UI editor first.");
 			ConsoleLogger.writeToConsole("Warning: Please open an LVGL UI editor first.");
 			return null;
 		}
-
-		DiagramEditor diagramEditor = (DiagramEditor) editor;
-		LvglScreen screen = diagramEditor.getScreen();
 
 		if (screen == null || screen.getWidgets().isEmpty()) {
 			ConsoleLogger.logWarning("The screen is empty. Please add some widgets first.");
@@ -51,7 +58,6 @@ public class GenerateCodeHandler extends AbstractHandler {
 
 		// Save generated files in the same folder as the gefxml file with the same base name
 		try {
-			IFile diagramFile = (IFile) diagramEditor.getEditorInput().getAdapter(IFile.class);
 			if (diagramFile != null) {
 				// Get the parent folder and base name of the gefxml file
 				IContainer parentFolder = diagramFile.getParent();

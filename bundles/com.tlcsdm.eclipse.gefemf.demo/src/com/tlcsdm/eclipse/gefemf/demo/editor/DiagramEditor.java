@@ -203,4 +203,16 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 	public LvglScreen getScreen() {
 		return screen;
 	}
+
+	/**
+	 * Set the screen model and refresh the graphical viewer.
+	 * Used by the multi-page editor when XML content changes.
+	 */
+	public void setScreen(LvglScreen newScreen) {
+		this.screen = newScreen;
+		GraphicalViewer viewer = getGraphicalViewer();
+		if (viewer != null) {
+			viewer.setContents(screen);
+		}
+	}
 }

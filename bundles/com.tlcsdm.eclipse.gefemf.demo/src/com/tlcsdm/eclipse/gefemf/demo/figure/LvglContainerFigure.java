@@ -92,15 +92,13 @@ public class LvglContainerFigure extends Figure {
 		g.drawRectangle(r.x, r.y, r.width - 1, r.height - 1);
 		g.setLineStyle(SWT.LINE_SOLID);
 
-		// Draw text content for container (show Text instead of Name for container widgets)
+		// Draw text content for container (only show Text property, not Name)
+		// Container widgets as parent components should not display the name field
 		if (text != null && !text.isEmpty()) {
 			g.setForegroundColor(ColorConstants.black);
 			g.drawString(text, r.x + 3, r.y + 3);
-		} else {
-			// Fallback to showing name label if no text is set
-			g.setForegroundColor(ColorConstants.black);
-			g.drawString(nameLabel.getText(), r.x + 3, r.y + 3);
 		}
+		// No fallback to name - container components should not display name
 	}
 
 	@Override
