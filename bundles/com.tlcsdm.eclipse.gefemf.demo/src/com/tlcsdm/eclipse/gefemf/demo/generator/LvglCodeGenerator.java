@@ -6,8 +6,10 @@
  ******************************************************************************/
 package com.tlcsdm.eclipse.gefemf.demo.generator;
 
+import com.tlcsdm.eclipse.gefemf.demo.Activator;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
+import com.tlcsdm.eclipse.gefemf.demo.preferences.LvglPreferenceConstants;
 
 /**
  * Code generator that generates LVGL C code from the screen model.
@@ -34,6 +36,26 @@ public class LvglCodeGenerator {
 	}
 
 	/**
+	 * Get the license header from preferences.
+	 * 
+	 * @return the license header text, or empty string if not configured
+	 */
+	private String getLicenseHeader() {
+		if (Activator.getDefault() != null) {
+			String header = Activator.getDefault().getPreferenceStore()
+					.getString(LvglPreferenceConstants.P_LICENSE_HEADER);
+			if (header != null && !header.isEmpty()) {
+				// Ensure the header ends with a newline
+				if (!header.endsWith("\n")) {
+					header = header + "\n";
+				}
+				return header + "\n";
+			}
+		}
+		return "";
+	}
+
+	/**
 	 * Generate the header file content.
 	 */
 	public String generateHeader() {
@@ -42,6 +64,9 @@ public class LvglCodeGenerator {
 		// Sanitize identifiers used in C code
 		String identifier = sanitizeIdentifier(generationName);
 		String guardName = identifier.toUpperCase() + "_H";
+
+		// Add license header from preferences
+		sb.append(getLicenseHeader());
 
 		sb.append("/**\n");
 		sb.append(" * @file ").append(generationName).append(".h\n");
@@ -88,6 +113,9 @@ public class LvglCodeGenerator {
 		String generationName = getGenerationName();
 		// Sanitize the identifier used in C code
 		String identifier = sanitizeIdentifier(generationName);
+
+		// Add license header from preferences
+		sb.append(getLicenseHeader());
 
 		sb.append("/**\n");
 		sb.append(" * @file ").append(generationName).append(".c\n");

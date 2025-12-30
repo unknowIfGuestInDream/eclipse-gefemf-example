@@ -16,9 +16,9 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.GraphicalViewer;
-import org.eclipse.gef.commands.CommandStackListener;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.palette.PaletteRoot;
+import org.eclipse.gef.ui.palette.PaletteViewer;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithPalette;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -109,17 +109,16 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		getActionRegistry().registerAction(generateAction);
 		
 		// Add context menu for right-click delete and other actions
+		// Note: We intentionally do NOT call getSite().registerContextMenu() to avoid
+		// Eclipse adding standard IDE contributions like "Run As", "Debug As", etc.
+		// This keeps the context menu clean with only editor-relevant actions.
 		ContextMenuProvider contextMenuProvider = new DiagramContextMenuProvider(viewer, getActionRegistry());
 		viewer.setContextMenu(contextMenuProvider);
-		getSite().registerContextMenu(contextMenuProvider, viewer);
 		
 		// Register as command stack listener to properly track dirty state
-		getCommandStack().addCommandStackListener(new CommandStackListener() {
-			@Override
-			public void commandStackChanged(EventObject event) {
-				DiagramEditor.this.commandStackChanged(event);
-			}
-		});
+		// Note: In GEF 3.x, addCommandStackListener is the recommended approach.
+		// The CommandStackListener interface has a single method, making it a functional interface.
+		getCommandStack().addCommandStackListener(this::commandStackChanged);
 	}
 
 	@Override
@@ -131,6 +130,19 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 	@Override
 	protected PaletteRoot getPaletteRoot() {
 		return LvglPaletteFactory.createPalette();
+	}
+
+	/**
+	 * Configure the palette viewer with vertical scrollbar support.
+	 * This enables scrolling when there are many palette entries.
+	 */
+	@Override
+	protected void configurePaletteViewer() {
+		super.configurePaletteViewer();
+		PaletteViewer viewer = getPaletteViewer();
+		if (viewer != null) {
+			viewer.enableVerticalScrollbar(true);
+		}
 	}
 
 	@Override

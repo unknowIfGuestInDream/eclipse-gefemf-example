@@ -57,6 +57,11 @@ public class LvglWidgetEditPart extends AbstractGraphicalEditPart implements Pro
 		if (isActive()) {
 			super.deactivate();
 			((LvglWidget) getModel()).removePropertyChangeListener(this);
+			// Dispose figure resources
+			LvglWidgetFigure figure = (LvglWidgetFigure) getFigure();
+			if (figure != null) {
+				figure.dispose();
+			}
 		}
 	}
 

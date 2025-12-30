@@ -92,4 +92,18 @@
             class="com.tlcsdm.eclipse.gefemf.demo.handler.GenerateCodeFromFileHandler">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.tlcsdm.eclipse.gefemf.demo.preferences.LvglPreferencePage"
+            id="com.tlcsdm.eclipse.gefemf.demo.preferences"
+            name="LVGL UI Editor">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.tlcsdm.eclipse.gefemf.demo.preferences.LvglPreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>
