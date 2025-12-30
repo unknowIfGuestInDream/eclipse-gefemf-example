@@ -191,14 +191,29 @@ public class LvglXmlSerializer {
 			widget.setChecked(Boolean.parseBoolean(checkedStr));
 		}
 
-		// Value properties (for Slider, Arc, Bar)
-		widget.setValue(parseInt(element.getAttribute("value"), 0));
-		widget.setMinValue(parseInt(element.getAttribute("minValue"), 0));
-		widget.setMaxValue(parseInt(element.getAttribute("maxValue"), 100));
+		// Value properties (only for Slider, Arc, Bar)
+		String valueStr = element.getAttribute("value");
+		if (valueStr != null && !valueStr.isEmpty()) {
+			widget.setValue(parseInt(valueStr, 0));
+		}
+		String minValueStr = element.getAttribute("minValue");
+		if (minValueStr != null && !minValueStr.isEmpty()) {
+			widget.setMinValue(parseInt(minValueStr, 0));
+		}
+		String maxValueStr = element.getAttribute("maxValue");
+		if (maxValueStr != null && !maxValueStr.isEmpty()) {
+			widget.setMaxValue(parseInt(maxValueStr, 100));
+		}
 
-		// Table properties
-		widget.setRowCount(parseInt(element.getAttribute("rowCount"), 3));
-		widget.setColumnCount(parseInt(element.getAttribute("columnCount"), 3));
+		// Table properties (only for Table widgets)
+		String rowCountStr = element.getAttribute("rowCount");
+		if (rowCountStr != null && !rowCountStr.isEmpty()) {
+			widget.setRowCount(parseInt(rowCountStr, 3));
+		}
+		String columnCountStr = element.getAttribute("columnCount");
+		if (columnCountStr != null && !columnCountStr.isEmpty()) {
+			widget.setColumnCount(parseInt(columnCountStr, 3));
+		}
 		String tableData = element.getAttribute("tableData");
 		if (tableData != null && !tableData.isEmpty()) {
 			widget.setTableData(tableData);

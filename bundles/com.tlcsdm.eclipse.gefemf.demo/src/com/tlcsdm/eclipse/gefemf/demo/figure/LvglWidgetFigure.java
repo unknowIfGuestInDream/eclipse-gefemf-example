@@ -232,10 +232,10 @@ public class LvglWidgetFigure extends Figure {
 		g.setBackgroundColor(ColorConstants.lightGray);
 		g.fillRectangle(r.x + 5, trackY - trackHeight / 2, r.width - 10, trackHeight);
 
-		// Calculate knob position based on value
+		// Calculate knob position based on value (using long arithmetic to avoid overflow)
 		int trackWidth = r.width - 10;
-		int range = maxValue - minValue;
-		int normalizedValue = range > 0 ? (value - minValue) * trackWidth / range : 0;
+		long range = (long) maxValue - minValue;
+		int normalizedValue = range > 0 ? (int) (((long) (value - minValue) * trackWidth) / range) : 0;
 		normalizedValue = Math.max(0, Math.min(normalizedValue, trackWidth));
 		
 		// Draw filled portion
@@ -332,9 +332,9 @@ public class LvglWidgetFigure extends Figure {
 		g.setLineWidth(8);
 		g.drawArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 135, 270);
 
-		// Calculate arc value angle based on value
-		int range = maxValue - minValue;
-		int normalizedValue = range > 0 ? (value - minValue) * 270 / range : 0;
+		// Calculate arc value angle based on value (using long arithmetic to avoid overflow)
+		long range = (long) maxValue - minValue;
+		int normalizedValue = range > 0 ? (int) (((long) (value - minValue) * 270) / range) : 0;
 		normalizedValue = Math.max(0, Math.min(normalizedValue, 270));
 
 		// Draw arc value portion
@@ -351,10 +351,10 @@ public class LvglWidgetFigure extends Figure {
 		g.setBackgroundColor(ColorConstants.lightGray);
 		g.fillRectangle(r.x + 5, barY, r.width - 10, barHeight);
 
-		// Calculate progress width based on value
-		int range = maxValue - minValue;
+		// Calculate progress width based on value (using long arithmetic to avoid overflow)
+		long range = (long) maxValue - minValue;
 		int barWidth = r.width - 10;
-		int progressWidth = range > 0 ? (value - minValue) * barWidth / range : 0;
+		int progressWidth = range > 0 ? (int) (((long) (value - minValue) * barWidth) / range) : 0;
 		progressWidth = Math.max(0, Math.min(progressWidth, barWidth));
 
 		// Draw progress
