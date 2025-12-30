@@ -39,7 +39,9 @@ public class LvglCodeGenerator {
 	public String generateHeader() {
 		StringBuilder sb = new StringBuilder();
 		String generationName = getGenerationName();
-		String guardName = generationName.toUpperCase() + "_H";
+		// Sanitize identifiers used in C code
+		String identifier = sanitizeIdentifier(generationName);
+		String guardName = identifier.toUpperCase() + "_H";
 
 		sb.append("/**\n");
 		sb.append(" * @file ").append(generationName).append(".h\n");
@@ -56,7 +58,7 @@ public class LvglCodeGenerator {
 		sb.append("#endif\n\n");
 
 		// Declare screen object
-		sb.append("extern lv_obj_t *").append(generationName).append(";\n\n");
+		sb.append("extern lv_obj_t *").append(identifier).append(";\n\n");
 
 		// Declare widget objects
 		for (LvglWidget widget : screen.getWidgets()) {
@@ -66,8 +68,8 @@ public class LvglCodeGenerator {
 		sb.append("\n");
 
 		// Function declarations
-		sb.append("void ").append(generationName).append("_create(void);\n");
-		sb.append("void ").append(generationName).append("_delete(void);\n");
+		sb.append("void ").append(identifier).append("_create(void);\n");
+		sb.append("void ").append(identifier).append("_delete(void);\n");
 
 		sb.append("\n#ifdef __cplusplus\n");
 		sb.append("}\n");
@@ -84,6 +86,8 @@ public class LvglCodeGenerator {
 	public String generateSource() {
 		StringBuilder sb = new StringBuilder();
 		String generationName = getGenerationName();
+		// Sanitize the identifier used in C code
+		String identifier = sanitizeIdentifier(generationName);
 
 		sb.append("/**\n");
 		sb.append(" * @file ").append(generationName).append(".c\n");
@@ -93,7 +97,7 @@ public class LvglCodeGenerator {
 		sb.append("#include \"").append(generationName).append(".h\"\n\n");
 
 		// Define screen object
-		sb.append("lv_obj_t *").append(generationName).append(" = NULL;\n\n");
+		sb.append("lv_obj_t *").append(identifier).append(" = NULL;\n\n");
 
 		// Define widget objects
 		for (LvglWidget widget : screen.getWidgets()) {
@@ -103,26 +107,26 @@ public class LvglCodeGenerator {
 		sb.append("\n");
 
 		// Create function
-		sb.append("void ").append(generationName).append("_create(void) {\n");
-		sb.append("    ").append(generationName).append(" = lv_obj_create(NULL);\n");
-		sb.append("    lv_obj_set_size(").append(generationName).append(", ");
+		sb.append("void ").append(identifier).append("_create(void) {\n");
+		sb.append("    ").append(identifier).append(" = lv_obj_create(NULL);\n");
+		sb.append("    lv_obj_set_size(").append(identifier).append(", ");
 		sb.append(screen.getWidth()).append(", ").append(screen.getHeight()).append(");\n");
-		sb.append("    lv_obj_set_style_bg_color(").append(generationName);
+		sb.append("    lv_obj_set_style_bg_color(").append(identifier);
 		sb.append(", lv_color_hex(0x").append(String.format("%06X", screen.getBgColor()));
 		sb.append("), LV_PART_MAIN);\n\n");
 
 		// Create widgets
 		for (LvglWidget widget : screen.getWidgets()) {
-			generateWidgetCreation(sb, widget, generationName, "    ");
+			generateWidgetCreation(sb, widget, identifier, "    ");
 		}
 
 		sb.append("}\n\n");
 
 		// Delete function
-		sb.append("void ").append(generationName).append("_delete(void) {\n");
-		sb.append("    if (").append(generationName).append(" != NULL) {\n");
-		sb.append("        lv_obj_del(").append(generationName).append(");\n");
-		sb.append("        ").append(generationName).append(" = NULL;\n");
+		sb.append("void ").append(identifier).append("_delete(void) {\n");
+		sb.append("    if (").append(identifier).append(" != NULL) {\n");
+		sb.append("        lv_obj_del(").append(identifier).append(");\n");
+		sb.append("        ").append(identifier).append(" = NULL;\n");
 		sb.append("    }\n");
 		sb.append("}\n");
 
@@ -195,8 +199,14 @@ public class LvglCodeGenerator {
 		if (widget.getWidgetType() == LvglWidget.WidgetType.IMAGE) {
 			String imageSource = widget.getImageSource();
 			if (imageSource != null && !imageSource.isEmpty()) {
-				sb.append(indent).append("lv_img_set_src(").append(varName);
-				sb.append(", ").append(imageSource).append(");\n");
+				// Validate image source - should be either:
+				// 1. A pointer reference like &image_name (alphanumeric + underscore after &)
+				// 2. A string path like "path/to/image.png" (must be properly quoted)
+				String validatedSource = validateImageSource(imageSource);
+				if (validatedSource != null) {
+					sb.append(indent).append("lv_img_set_src(").append(varName);
+					sb.append(", ").append(validatedSource).append(");\n");
+				}
 			}
 		}
 
@@ -303,5 +313,75 @@ public class LvglCodeGenerator {
 
 	private String escapeString(String str) {
 		return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+	}
+
+	/**
+	 * Sanitize a string to be a valid C identifier.
+	 * Replaces invalid characters with underscores.
+	 */
+	private String sanitizeIdentifier(String str) {
+		if (str == null || str.isEmpty()) {
+			return "_";
+		}
+		String sanitized = str.replaceAll("[^a-zA-Z0-9_]", "_");
+		// C identifiers cannot start with a digit
+		if (Character.isDigit(sanitized.charAt(0))) {
+			sanitized = "_" + sanitized;
+		}
+		return sanitized;
+	}
+
+	/**
+	 * Validate and sanitize image source for safe inclusion in C code.
+	 * Returns null if the source is invalid.
+	 * 
+	 * Valid formats:
+	 * - Pointer reference: &identifier (e.g., &my_image)
+	 * - String path: "path/to/image" (will be quoted if not already)
+	 * - LV_SYMBOL constants: LV_SYMBOL_* macros
+	 */
+	private String validateImageSource(String source) {
+		if (source == null || source.isEmpty()) {
+			return null;
+		}
+		
+		String trimmed = source.trim();
+		
+		// Check for pointer reference (e.g., &image_name)
+		if (trimmed.startsWith("&")) {
+			String identifier = trimmed.substring(1);
+			// Validate the identifier part
+			if (identifier.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
+				return trimmed;
+			}
+			return null;
+		}
+		
+		// Check for LV_SYMBOL macro
+		if (trimmed.startsWith("LV_SYMBOL_")) {
+			if (trimmed.matches("LV_SYMBOL_[A-Z_]+")) {
+				return trimmed;
+			}
+			return null;
+		}
+		
+		// For string paths, ensure it's properly quoted
+		if (trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+			// Already quoted - validate and escape the content
+			String content = trimmed.substring(1, trimmed.length() - 1);
+			// Basic path validation - no code injection characters
+			if (!content.matches(".*[;{}()\\[\\]].*")) {
+				return "\"" + escapeString(content) + "\"";
+			}
+			return null;
+		}
+		
+		// Unquoted string - treat as path and add quotes
+		// Basic path validation - no code injection characters
+		if (!trimmed.matches(".*[;{}()\\[\\]&].*")) {
+			return "\"" + escapeString(trimmed) + "\"";
+		}
+		
+		return null;
 	}
 }

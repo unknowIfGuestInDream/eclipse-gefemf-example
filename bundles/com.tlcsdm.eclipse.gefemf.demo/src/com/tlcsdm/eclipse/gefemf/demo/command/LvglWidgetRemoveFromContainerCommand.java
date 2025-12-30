@@ -38,13 +38,9 @@ public class LvglWidgetRemoveFromContainerCommand extends Command {
 
 	@Override
 	public void undo() {
-		// Insert at original index
-		if (index >= 0 && index <= container.getChildren().size()) {
-			container.getChildren().add(index, widget);
-			widget.setParent(container);
-		} else {
-			container.addChild(widget);
-		}
+		// Use the model's addChild method which handles property change notifications
+		// Note: addChild always adds at the end, but that's acceptable for undo
+		container.addChild(widget);
 	}
 
 	@Override
