@@ -12,15 +12,14 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.tlcsdm.eclipse.gefemf.demo.generator.LvglCodeGenerator;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 
 /**
- * Action for generating LVGL C code from the diagram editor.
- * Can be invoked from the context menu or toolbar.
+ * Action for generating LVGL C code from the diagram editor. Can be invoked
+ * from the context menu or toolbar.
  */
 public class GenerateLvglCodeAction extends Action {
 

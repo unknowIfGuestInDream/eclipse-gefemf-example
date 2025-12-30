@@ -17,7 +17,6 @@ public class LvglWidgetRemoveFromContainerCommand extends Command {
 
 	private final LvglWidget container;
 	private final LvglWidget widget;
-	private int index;
 
 	public LvglWidgetRemoveFromContainerCommand(LvglWidget container, LvglWidget widget) {
 		this.container = container;
@@ -32,7 +31,6 @@ public class LvglWidgetRemoveFromContainerCommand extends Command {
 
 	@Override
 	public void execute() {
-		index = container.getChildren().indexOf(widget);
 		container.removeChild(widget);
 	}
 
