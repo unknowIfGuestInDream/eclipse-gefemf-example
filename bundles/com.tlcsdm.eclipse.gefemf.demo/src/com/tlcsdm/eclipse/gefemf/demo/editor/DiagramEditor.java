@@ -30,6 +30,7 @@ import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglXmlSerializer;
 import com.tlcsdm.eclipse.gefemf.demo.palette.LvglPaletteFactory;
+import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
 
 /**
  * GEF Editor for LVGL UI design.
@@ -133,6 +134,15 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 	}
 
 	/**
+	 * Get the initial width of the palette.
+	 * Increased from default to ensure widget names are fully visible.
+	 */
+	@Override
+	protected int getInitialPaletteSize() {
+		return 180; // Wider than default (125) to show full widget names
+	}
+
+	/**
 	 * Configure the palette viewer with vertical scrollbar support.
 	 * This enables scrolling when there are many palette entries.
 	 */
@@ -164,7 +174,7 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 				getCommandStack().markSaveLocation();
 				firePropertyChange(PROP_DIRTY);
 			} catch (Exception e) {
-				e.printStackTrace();
+				ConsoleLogger.logError("Failed to save diagram", e);
 			}
 		}
 	}

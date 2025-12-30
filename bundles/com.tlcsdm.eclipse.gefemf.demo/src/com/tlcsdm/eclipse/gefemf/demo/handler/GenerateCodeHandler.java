@@ -22,10 +22,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditor;
 import com.tlcsdm.eclipse.gefemf.demo.generator.LvglCodeGenerator;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
+import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
 
 /**
  * Handler for the Generate C Code command.
- * Outputs log messages to the console instead of showing dialogs.
+ * Outputs log messages to the Eclipse platform log and console.
  */
 public class GenerateCodeHandler extends AbstractHandler {
 
@@ -34,7 +35,8 @@ public class GenerateCodeHandler extends AbstractHandler {
 		IEditorPart editor = HandlerUtil.getActiveEditor(event);
 
 		if (!(editor instanceof DiagramEditor)) {
-			logToConsole("Warning: Please open an LVGL UI editor first.");
+			ConsoleLogger.logWarning("Please open an LVGL UI editor first.");
+			ConsoleLogger.writeToConsole("Warning: Please open an LVGL UI editor first.");
 			return null;
 		}
 
@@ -42,7 +44,8 @@ public class GenerateCodeHandler extends AbstractHandler {
 		LvglScreen screen = diagramEditor.getScreen();
 
 		if (screen == null || screen.getWidgets().isEmpty()) {
-			logToConsole("Warning: The screen is empty. Please add some widgets first.");
+			ConsoleLogger.logWarning("The screen is empty. Please add some widgets first.");
+			ConsoleLogger.writeToConsole("Warning: The screen is empty. Please add some widgets first.");
 			return null;
 		}
 
@@ -81,13 +84,14 @@ public class GenerateCodeHandler extends AbstractHandler {
 					sourceFile.create(cSource, true, new NullProgressMonitor());
 				}
 
-				logToConsole("Successfully generated LVGL C code:");
-				logToConsole("  " + headerFile.getFullPath().toString());
-				logToConsole("  " + sourceFile.getFullPath().toString());
+				ConsoleLogger.logInfo("Successfully generated LVGL C code: " + headerFile.getFullPath() + ", " + sourceFile.getFullPath());
+				ConsoleLogger.writeToConsole("Successfully generated LVGL C code:");
+				ConsoleLogger.writeToConsole("  " + headerFile.getFullPath().toString());
+				ConsoleLogger.writeToConsole("  " + sourceFile.getFullPath().toString());
 			}
 		} catch (Exception e) {
-			logToConsole("Error: Failed to generate code: " + e.getMessage());
-			e.printStackTrace();
+			ConsoleLogger.logError("Failed to generate code: " + e.getMessage(), e);
+			ConsoleLogger.writeToConsole("Error: Failed to generate code: " + e.getMessage());
 		}
 
 		return null;
@@ -101,9 +105,5 @@ public class GenerateCodeHandler extends AbstractHandler {
 			}
 			folder.create(true, true, new NullProgressMonitor());
 		}
-	}
-
-	private void logToConsole(String message) {
-		System.out.println("[LVGL Code Generator] " + message);
 	}
 }

@@ -92,14 +92,14 @@ public class LvglContainerFigure extends Figure {
 		g.drawRectangle(r.x, r.y, r.width - 1, r.height - 1);
 		g.setLineStyle(SWT.LINE_SOLID);
 
-		// Draw widget name only (no type label for LVGL-like appearance)
-		g.setForegroundColor(ColorConstants.black);
-		g.drawString(nameLabel.getText(), r.x + 3, r.y + 3);
-
-		// Draw text content if present
+		// Draw text content for container (show Text instead of Name for container widgets)
 		if (text != null && !text.isEmpty()) {
-			g.setForegroundColor(ColorConstants.darkGray);
-			g.drawString(text, r.x + 5, r.y + 18);
+			g.setForegroundColor(ColorConstants.black);
+			g.drawString(text, r.x + 3, r.y + 3);
+		} else {
+			// Fallback to showing name label if no text is set
+			g.setForegroundColor(ColorConstants.black);
+			g.drawString(nameLabel.getText(), r.x + 3, r.y + 3);
 		}
 	}
 

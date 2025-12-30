@@ -12,10 +12,14 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.tlcsdm.eclipse.gefemf.demo.Activator;
 import com.tlcsdm.eclipse.gefemf.demo.generator.LvglCodeGenerator;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
+import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
 
 /**
  * Action for generating LVGL C code from the diagram editor. Can be invoked
@@ -30,12 +34,18 @@ public class GenerateLvglCodeAction extends Action {
 		this.workbenchPart = part;
 		setId(DiagramContextMenuProvider.GENERATE_LVGL_CODE_ACTION_ID);
 		setToolTipText("Generate LVGL C Code from Diagram");
+		// Set icon for the action
+		ImageDescriptor icon = AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/generate.png");
+		if (icon != null) {
+			setImageDescriptor(icon);
+		}
 	}
 
 	@Override
 	public void run() {
 		if (!(workbenchPart instanceof DiagramEditor)) {
-			logToConsole("Warning: Please open an LVGL UI editor first.");
+			ConsoleLogger.logWarning("Please open an LVGL UI editor first.");
+			ConsoleLogger.writeToConsole("Warning: Please open an LVGL UI editor first.");
 			return;
 		}
 
@@ -43,7 +53,8 @@ public class GenerateLvglCodeAction extends Action {
 		LvglScreen screen = diagramEditor.getScreen();
 
 		if (screen == null || screen.getWidgets().isEmpty()) {
-			logToConsole("Warning: The screen is empty. Please add some widgets first.");
+			ConsoleLogger.logWarning("The screen is empty. Please add some widgets first.");
+			ConsoleLogger.writeToConsole("Warning: The screen is empty. Please add some widgets first.");
 			return;
 		}
 
@@ -76,17 +87,14 @@ public class GenerateLvglCodeAction extends Action {
 					sourceFile.create(cSource, true, new NullProgressMonitor());
 				}
 
-				logToConsole("Successfully generated LVGL C code:");
-				logToConsole("  " + headerFile.getFullPath().toString());
-				logToConsole("  " + sourceFile.getFullPath().toString());
+				ConsoleLogger.logInfo("Successfully generated LVGL C code: " + headerFile.getFullPath() + ", " + sourceFile.getFullPath());
+				ConsoleLogger.writeToConsole("Successfully generated LVGL C code:");
+				ConsoleLogger.writeToConsole("  " + headerFile.getFullPath().toString());
+				ConsoleLogger.writeToConsole("  " + sourceFile.getFullPath().toString());
 			}
 		} catch (Exception e) {
-			logToConsole("Error: Failed to generate code: " + e.getMessage());
-			e.printStackTrace();
+			ConsoleLogger.logError("Failed to generate code: " + e.getMessage(), e);
+			ConsoleLogger.writeToConsole("Error: Failed to generate code: " + e.getMessage());
 		}
-	}
-
-	private void logToConsole(String message) {
-		System.out.println("[LVGL Code Generator] " + message);
 	}
 }

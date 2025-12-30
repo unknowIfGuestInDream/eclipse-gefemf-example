@@ -9,6 +9,7 @@ package com.tlcsdm.eclipse.gefemf.demo.property;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -135,24 +136,24 @@ public class LvglWidgetPropertySource implements IPropertySource {
 		heightDescriptor.setCategory(CATEGORY_SIZE);
 		descriptors.add(heightDescriptor);
 
-		// Style properties
-		TextPropertyDescriptor bgColorDescriptor = new TextPropertyDescriptor(PROPERTY_BG_COLOR, "Background Color");
+		// Style properties - Use ColorPropertyDescriptor for color fields
+		ColorPropertyDescriptor bgColorDescriptor = new ColorPropertyDescriptor(PROPERTY_BG_COLOR, "Background Color");
 		bgColorDescriptor.setCategory(CATEGORY_STYLE);
-		bgColorDescriptor.setDescription("Background color in hex format (e.g., #FFFFFF)");
+		bgColorDescriptor.setDescription("Background color (click to open color dialog)");
 		descriptors.add(bgColorDescriptor);
 
-		TextPropertyDescriptor textColorDescriptor = new TextPropertyDescriptor(PROPERTY_TEXT_COLOR, "Text Color");
+		ColorPropertyDescriptor textColorDescriptor = new ColorPropertyDescriptor(PROPERTY_TEXT_COLOR, "Text Color");
 		textColorDescriptor.setCategory(CATEGORY_STYLE);
-		textColorDescriptor.setDescription("Text color in hex format (e.g., #000000)");
+		textColorDescriptor.setDescription("Text color (click to open color dialog)");
 		descriptors.add(textColorDescriptor);
 
 		TextPropertyDescriptor borderWidthDescriptor = new TextPropertyDescriptor(PROPERTY_BORDER_WIDTH, "Border Width");
 		borderWidthDescriptor.setCategory(CATEGORY_STYLE);
 		descriptors.add(borderWidthDescriptor);
 
-		TextPropertyDescriptor borderColorDescriptor = new TextPropertyDescriptor(PROPERTY_BORDER_COLOR, "Border Color");
+		ColorPropertyDescriptor borderColorDescriptor = new ColorPropertyDescriptor(PROPERTY_BORDER_COLOR, "Border Color");
 		borderColorDescriptor.setCategory(CATEGORY_STYLE);
-		borderColorDescriptor.setDescription("Border color in hex format (e.g., #000000)");
+		borderColorDescriptor.setDescription("Border color (click to open color dialog)");
 		descriptors.add(borderColorDescriptor);
 
 		TextPropertyDescriptor radiusDescriptor = new TextPropertyDescriptor(PROPERTY_RADIUS, "Corner Radius");
@@ -278,13 +279,13 @@ public class LvglWidgetPropertySource implements IPropertySource {
 		case PROPERTY_HEIGHT:
 			return String.valueOf(widget.getBounds().height);
 		case PROPERTY_BG_COLOR:
-			return PropertyUtils.formatColor(widget.getBgColor());
+			return ColorPropertyDescriptor.intToRgb(widget.getBgColor());
 		case PROPERTY_TEXT_COLOR:
-			return PropertyUtils.formatColor(widget.getTextColor());
+			return ColorPropertyDescriptor.intToRgb(widget.getTextColor());
 		case PROPERTY_BORDER_WIDTH:
 			return String.valueOf(widget.getBorderWidth());
 		case PROPERTY_BORDER_COLOR:
-			return PropertyUtils.formatColor(widget.getBorderColor());
+			return ColorPropertyDescriptor.intToRgb(widget.getBorderColor());
 		case PROPERTY_RADIUS:
 			return String.valueOf(widget.getRadius());
 		case PROPERTY_IMAGE_SOURCE:
@@ -424,16 +425,22 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			setHeight((String) value);
 			break;
 		case PROPERTY_BG_COLOR:
-			widget.setBgColor(PropertyUtils.parseColor((String) value));
+			if (value instanceof RGB) {
+				widget.setBgColor(ColorPropertyDescriptor.rgbToInt((RGB) value));
+			}
 			break;
 		case PROPERTY_TEXT_COLOR:
-			widget.setTextColor(PropertyUtils.parseColor((String) value));
+			if (value instanceof RGB) {
+				widget.setTextColor(ColorPropertyDescriptor.rgbToInt((RGB) value));
+			}
 			break;
 		case PROPERTY_BORDER_WIDTH:
 			widget.setBorderWidth(PropertyUtils.parseInt((String) value, 0));
 			break;
 		case PROPERTY_BORDER_COLOR:
-			widget.setBorderColor(PropertyUtils.parseColor((String) value));
+			if (value instanceof RGB) {
+				widget.setBorderColor(ColorPropertyDescriptor.rgbToInt((RGB) value));
+			}
 			break;
 		case PROPERTY_RADIUS:
 			widget.setRadius(PropertyUtils.parseInt((String) value, 0));
