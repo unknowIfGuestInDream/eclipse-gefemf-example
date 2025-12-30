@@ -13,6 +13,7 @@ import org.eclipse.gef.palette.PaletteDrawer;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.palette.SelectionToolEntry;
 import org.eclipse.gef.requests.CreationFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 
@@ -38,29 +39,15 @@ public class LvglPaletteFactory {
 		PaletteDrawer basicDrawer = new PaletteDrawer("Basic Widgets");
 
 		// Button
-		CreationToolEntry buttonTool = new CreationToolEntry("Button", "Create an LVGL button",
-				new LvglWidgetFactory(LvglWidget.WidgetType.BUTTON), null, null);
-		basicDrawer.add(buttonTool);
-
+		basicDrawer.add(createWidgetEntry("Button", "Create an LVGL button", LvglWidget.WidgetType.BUTTON));
 		// Label
-		CreationToolEntry labelTool = new CreationToolEntry("Label", "Create an LVGL label",
-				new LvglWidgetFactory(LvglWidget.WidgetType.LABEL), null, null);
-		basicDrawer.add(labelTool);
-
+		basicDrawer.add(createWidgetEntry("Label", "Create an LVGL label", LvglWidget.WidgetType.LABEL));
 		// Container
-		CreationToolEntry containerTool = new CreationToolEntry("Container", "Create an LVGL container",
-				new LvglWidgetFactory(LvglWidget.WidgetType.CONTAINER), null, null);
-		basicDrawer.add(containerTool);
-
+		basicDrawer.add(createWidgetEntry("Container", "Create an LVGL container", LvglWidget.WidgetType.CONTAINER));
 		// Image
-		CreationToolEntry imageTool = new CreationToolEntry("Image", "Create an LVGL image",
-				new LvglWidgetFactory(LvglWidget.WidgetType.IMAGE), null, null);
-		basicDrawer.add(imageTool);
-
+		basicDrawer.add(createWidgetEntry("Image", "Create an LVGL image", LvglWidget.WidgetType.IMAGE));
 		// Line
-		CreationToolEntry lineTool = new CreationToolEntry("Line", "Create an LVGL line",
-				new LvglWidgetFactory(LvglWidget.WidgetType.LINE), null, null);
-		basicDrawer.add(lineTool);
+		basicDrawer.add(createWidgetEntry("Line", "Create an LVGL line", LvglWidget.WidgetType.LINE));
 
 		palette.add(basicDrawer);
 
@@ -68,49 +55,23 @@ public class LvglPaletteFactory {
 		PaletteDrawer inputDrawer = new PaletteDrawer("Input Widgets");
 
 		// Slider
-		CreationToolEntry sliderTool = new CreationToolEntry("Slider", "Create an LVGL slider",
-				new LvglWidgetFactory(LvglWidget.WidgetType.SLIDER), null, null);
-		inputDrawer.add(sliderTool);
-
+		inputDrawer.add(createWidgetEntry("Slider", "Create an LVGL slider", LvglWidget.WidgetType.SLIDER));
 		// Switch
-		CreationToolEntry switchTool = new CreationToolEntry("Switch", "Create an LVGL switch",
-				new LvglWidgetFactory(LvglWidget.WidgetType.SWITCH), null, null);
-		inputDrawer.add(switchTool);
-
+		inputDrawer.add(createWidgetEntry("Switch", "Create an LVGL switch", LvglWidget.WidgetType.SWITCH));
 		// Checkbox
-		CreationToolEntry checkboxTool = new CreationToolEntry("Checkbox", "Create an LVGL checkbox",
-				new LvglWidgetFactory(LvglWidget.WidgetType.CHECKBOX), null, null);
-		inputDrawer.add(checkboxTool);
-
+		inputDrawer.add(createWidgetEntry("Checkbox", "Create an LVGL checkbox", LvglWidget.WidgetType.CHECKBOX));
 		// Dropdown
-		CreationToolEntry dropdownTool = new CreationToolEntry("Dropdown", "Create an LVGL dropdown",
-				new LvglWidgetFactory(LvglWidget.WidgetType.DROPDOWN), null, null);
-		inputDrawer.add(dropdownTool);
-
+		inputDrawer.add(createWidgetEntry("Dropdown", "Create an LVGL dropdown", LvglWidget.WidgetType.DROPDOWN));
 		// Textarea
-		CreationToolEntry textareaTool = new CreationToolEntry("Textarea", "Create an LVGL textarea",
-				new LvglWidgetFactory(LvglWidget.WidgetType.TEXTAREA), null, null);
-		inputDrawer.add(textareaTool);
-
+		inputDrawer.add(createWidgetEntry("Textarea", "Create an LVGL textarea", LvglWidget.WidgetType.TEXTAREA));
 		// Roller
-		CreationToolEntry rollerTool = new CreationToolEntry("Roller", "Create an LVGL roller",
-				new LvglWidgetFactory(LvglWidget.WidgetType.ROLLER), null, null);
-		inputDrawer.add(rollerTool);
-
+		inputDrawer.add(createWidgetEntry("Roller", "Create an LVGL roller", LvglWidget.WidgetType.ROLLER));
 		// Spinbox
-		CreationToolEntry spinboxTool = new CreationToolEntry("Spinbox", "Create an LVGL spinbox",
-				new LvglWidgetFactory(LvglWidget.WidgetType.SPINBOX), null, null);
-		inputDrawer.add(spinboxTool);
-
+		inputDrawer.add(createWidgetEntry("Spinbox", "Create an LVGL spinbox", LvglWidget.WidgetType.SPINBOX));
 		// Keyboard
-		CreationToolEntry keyboardTool = new CreationToolEntry("Keyboard", "Create an LVGL keyboard",
-				new LvglWidgetFactory(LvglWidget.WidgetType.KEYBOARD), null, null);
-		inputDrawer.add(keyboardTool);
-
+		inputDrawer.add(createWidgetEntry("Keyboard", "Create an LVGL keyboard", LvglWidget.WidgetType.KEYBOARD));
 		// Button Matrix
-		CreationToolEntry btnMatrixTool = new CreationToolEntry("Button Matrix", "Create an LVGL button matrix",
-				new LvglWidgetFactory(LvglWidget.WidgetType.BUTTONMATRIX), null, null);
-		inputDrawer.add(btnMatrixTool);
+		inputDrawer.add(createWidgetEntry("Button Matrix", "Create an LVGL button matrix", LvglWidget.WidgetType.BUTTONMATRIX));
 
 		palette.add(inputDrawer);
 
@@ -118,39 +79,19 @@ public class LvglPaletteFactory {
 		PaletteDrawer displayDrawer = new PaletteDrawer("Display Widgets");
 
 		// Arc
-		CreationToolEntry arcTool = new CreationToolEntry("Arc", "Create an LVGL arc",
-				new LvglWidgetFactory(LvglWidget.WidgetType.ARC), null, null);
-		displayDrawer.add(arcTool);
-
+		displayDrawer.add(createWidgetEntry("Arc", "Create an LVGL arc", LvglWidget.WidgetType.ARC));
 		// Bar
-		CreationToolEntry barTool = new CreationToolEntry("Bar", "Create an LVGL progress bar",
-				new LvglWidgetFactory(LvglWidget.WidgetType.BAR), null, null);
-		displayDrawer.add(barTool);
-
+		displayDrawer.add(createWidgetEntry("Bar", "Create an LVGL progress bar", LvglWidget.WidgetType.BAR));
 		// LED
-		CreationToolEntry ledTool = new CreationToolEntry("LED", "Create an LVGL LED",
-				new LvglWidgetFactory(LvglWidget.WidgetType.LED), null, null);
-		displayDrawer.add(ledTool);
-
+		displayDrawer.add(createWidgetEntry("LED", "Create an LVGL LED", LvglWidget.WidgetType.LED));
 		// Scale
-		CreationToolEntry scaleTool = new CreationToolEntry("Scale", "Create an LVGL scale",
-				new LvglWidgetFactory(LvglWidget.WidgetType.SCALE), null, null);
-		displayDrawer.add(scaleTool);
-
+		displayDrawer.add(createWidgetEntry("Scale", "Create an LVGL scale", LvglWidget.WidgetType.SCALE));
 		// Spinner
-		CreationToolEntry spinnerTool = new CreationToolEntry("Spinner", "Create an LVGL spinner",
-				new LvglWidgetFactory(LvglWidget.WidgetType.SPINNER), null, null);
-		displayDrawer.add(spinnerTool);
-
+		displayDrawer.add(createWidgetEntry("Spinner", "Create an LVGL spinner", LvglWidget.WidgetType.SPINNER));
 		// Animation Image
-		CreationToolEntry animImgTool = new CreationToolEntry("Animation Image", "Create an LVGL animation image",
-				new LvglWidgetFactory(LvglWidget.WidgetType.ANIMIMG), null, null);
-		displayDrawer.add(animImgTool);
-
+		displayDrawer.add(createWidgetEntry("Animation Image", "Create an LVGL animation image", LvglWidget.WidgetType.ANIMIMG));
 		// Arc Label
-		CreationToolEntry arcLabelTool = new CreationToolEntry("Arc Label", "Create an LVGL arc label",
-				new LvglWidgetFactory(LvglWidget.WidgetType.ARCLABEL), null, null);
-		displayDrawer.add(arcLabelTool);
+		displayDrawer.add(createWidgetEntry("Arc Label", "Create an LVGL arc label", LvglWidget.WidgetType.ARCLABEL));
 
 		palette.add(displayDrawer);
 
@@ -158,24 +99,13 @@ public class LvglPaletteFactory {
 		PaletteDrawer dataDrawer = new PaletteDrawer("Data Widgets");
 
 		// Chart
-		CreationToolEntry chartTool = new CreationToolEntry("Chart", "Create an LVGL chart",
-				new LvglWidgetFactory(LvglWidget.WidgetType.CHART), null, null);
-		dataDrawer.add(chartTool);
-
+		dataDrawer.add(createWidgetEntry("Chart", "Create an LVGL chart", LvglWidget.WidgetType.CHART));
 		// Table
-		CreationToolEntry tableTool = new CreationToolEntry("Table", "Create an LVGL table",
-				new LvglWidgetFactory(LvglWidget.WidgetType.TABLE), null, null);
-		dataDrawer.add(tableTool);
-
+		dataDrawer.add(createWidgetEntry("Table", "Create an LVGL table", LvglWidget.WidgetType.TABLE));
 		// Calendar
-		CreationToolEntry calendarTool = new CreationToolEntry("Calendar", "Create an LVGL calendar",
-				new LvglWidgetFactory(LvglWidget.WidgetType.CALENDAR), null, null);
-		dataDrawer.add(calendarTool);
-
+		dataDrawer.add(createWidgetEntry("Calendar", "Create an LVGL calendar", LvglWidget.WidgetType.CALENDAR));
 		// Spangroup
-		CreationToolEntry spangroupTool = new CreationToolEntry("Spangroup", "Create an LVGL spangroup",
-				new LvglWidgetFactory(LvglWidget.WidgetType.SPANGROUP), null, null);
-		dataDrawer.add(spangroupTool);
+		dataDrawer.add(createWidgetEntry("Spangroup", "Create an LVGL spangroup", LvglWidget.WidgetType.SPANGROUP));
 
 		palette.add(dataDrawer);
 
@@ -183,34 +113,17 @@ public class LvglPaletteFactory {
 		PaletteDrawer containerDrawer = new PaletteDrawer("Container Widgets");
 
 		// List
-		CreationToolEntry listTool = new CreationToolEntry("List", "Create an LVGL list",
-				new LvglWidgetFactory(LvglWidget.WidgetType.LIST), null, null);
-		containerDrawer.add(listTool);
-
+		containerDrawer.add(createWidgetEntry("List", "Create an LVGL list", LvglWidget.WidgetType.LIST));
 		// Menu
-		CreationToolEntry menuTool = new CreationToolEntry("Menu", "Create an LVGL menu",
-				new LvglWidgetFactory(LvglWidget.WidgetType.MENU), null, null);
-		containerDrawer.add(menuTool);
-
+		containerDrawer.add(createWidgetEntry("Menu", "Create an LVGL menu", LvglWidget.WidgetType.MENU));
 		// Tab View
-		CreationToolEntry tabViewTool = new CreationToolEntry("Tab View", "Create an LVGL tab view",
-				new LvglWidgetFactory(LvglWidget.WidgetType.TABVIEW), null, null);
-		containerDrawer.add(tabViewTool);
-
+		containerDrawer.add(createWidgetEntry("Tab View", "Create an LVGL tab view", LvglWidget.WidgetType.TABVIEW));
 		// Tile View
-		CreationToolEntry tileViewTool = new CreationToolEntry("Tile View", "Create an LVGL tile view",
-				new LvglWidgetFactory(LvglWidget.WidgetType.TILEVIEW), null, null);
-		containerDrawer.add(tileViewTool);
-
+		containerDrawer.add(createWidgetEntry("Tile View", "Create an LVGL tile view", LvglWidget.WidgetType.TILEVIEW));
 		// Window
-		CreationToolEntry winTool = new CreationToolEntry("Window", "Create an LVGL window",
-				new LvglWidgetFactory(LvglWidget.WidgetType.WIN), null, null);
-		containerDrawer.add(winTool);
-
+		containerDrawer.add(createWidgetEntry("Window", "Create an LVGL window", LvglWidget.WidgetType.WIN));
 		// Message Box
-		CreationToolEntry msgboxTool = new CreationToolEntry("Message Box", "Create an LVGL message box",
-				new LvglWidgetFactory(LvglWidget.WidgetType.MSGBOX), null, null);
-		containerDrawer.add(msgboxTool);
+		containerDrawer.add(createWidgetEntry("Message Box", "Create an LVGL message box", LvglWidget.WidgetType.MSGBOX));
 
 		palette.add(containerDrawer);
 
@@ -218,18 +131,21 @@ public class LvglPaletteFactory {
 		PaletteDrawer specialDrawer = new PaletteDrawer("Special Widgets");
 
 		// Image Button
-		CreationToolEntry imgBtnTool = new CreationToolEntry("Image Button", "Create an LVGL image button",
-				new LvglWidgetFactory(LvglWidget.WidgetType.IMAGEBUTTON), null, null);
-		specialDrawer.add(imgBtnTool);
-
+		specialDrawer.add(createWidgetEntry("Image Button", "Create an LVGL image button", LvglWidget.WidgetType.IMAGEBUTTON));
 		// Canvas
-		CreationToolEntry canvasTool = new CreationToolEntry("Canvas", "Create an LVGL canvas",
-				new LvglWidgetFactory(LvglWidget.WidgetType.CANVAS), null, null);
-		specialDrawer.add(canvasTool);
+		specialDrawer.add(createWidgetEntry("Canvas", "Create an LVGL canvas", LvglWidget.WidgetType.CANVAS));
 
 		palette.add(specialDrawer);
 
 		return palette;
+	}
+
+	/**
+	 * Create a palette entry for a widget type with icon.
+	 */
+	private static CreationToolEntry createWidgetEntry(String label, String description, LvglWidget.WidgetType type) {
+		ImageDescriptor icon = LvglWidgetIcons.getIcon(type);
+		return new CreationToolEntry(label, description, new LvglWidgetFactory(type), icon, icon);
 	}
 
 	/**

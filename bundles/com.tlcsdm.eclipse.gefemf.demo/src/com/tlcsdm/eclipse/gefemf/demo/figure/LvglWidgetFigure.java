@@ -15,28 +15,29 @@ import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 
 /**
  * Figure representing an LVGL widget in the editor.
+ * <p>
+ * The figure renders widgets to look like actual LVGL components without 
+ * displaying the widget type label, providing a more realistic preview.
+ * </p>
  */
 public class LvglWidgetFigure extends Figure {
 
 	private final Label nameLabel;
-	private final Label typeLabel;
 	private LvglWidget.WidgetType widgetType = LvglWidget.WidgetType.BUTTON;
 	private String text = "";
 	private int bgColor = 0xFFFFFF;
+	private Color bgColorInstance;
 
 	public LvglWidgetFigure() {
 		setLayoutManager(new XYLayout());
 		setBorder(new LineBorder(ColorConstants.black, 1));
 		setOpaque(true);
-
-		typeLabel = new Label();
-		typeLabel.setForegroundColor(ColorConstants.gray);
-		add(typeLabel);
 
 		nameLabel = new Label();
 		add(nameLabel);
@@ -44,7 +45,6 @@ public class LvglWidgetFigure extends Figure {
 
 	public void setWidgetType(LvglWidget.WidgetType type) {
 		this.widgetType = type;
-		typeLabel.setText("[" + type.getDisplayName() + "]");
 		repaint();
 	}
 
@@ -59,6 +59,15 @@ public class LvglWidgetFigure extends Figure {
 
 	public void setWidgetBgColor(int color) {
 		this.bgColor = color;
+		// Dispose old color if we created one
+		if (bgColorInstance != null && !bgColorInstance.isDisposed()) {
+			bgColorInstance.dispose();
+		}
+		// Create new color from hex value
+		int r = (color >> 16) & 0xFF;
+		int g = (color >> 8) & 0xFF;
+		int b = color & 0xFF;
+		bgColorInstance = new Color(Display.getCurrent(), r, g, b);
 		repaint();
 	}
 
@@ -66,16 +75,20 @@ public class LvglWidgetFigure extends Figure {
 	protected void paintFigure(Graphics g) {
 		Rectangle r = getBounds().getCopy();
 
-		// Draw background based on widget type
+		// Draw background using custom bgColor if set, otherwise use type-based color
 		Color bg = getBackgroundColorForType();
 		g.setBackgroundColor(bg);
 		g.fillRectangle(r);
 
-		// Draw widget-specific representation
+		// Draw widget-specific representation (LVGL-like appearance without type label)
 		drawWidgetRepresentation(g, r);
 	}
 
 	private Color getBackgroundColorForType() {
+		// If custom bgColor is set (not default white), use it
+		if (bgColorInstance != null && !bgColorInstance.isDisposed() && bgColor != 0xFFFFFF) {
+			return bgColorInstance;
+		}
 		// Use a light color variation based on widget type
 		switch (widgetType) {
 		case BUTTON:
@@ -139,35 +152,35 @@ public class LvglWidgetFigure extends Figure {
 		case CONTAINER:
 			drawContainer(g, r);
 			break;
+		default:
+			drawDefault(g, r);
+			break;
 		}
-
-		// Draw widget type label at top
-		g.setForegroundColor(ColorConstants.darkGray);
-		String typeStr = "[" + widgetType.getDisplayName() + "]";
-		g.drawString(typeStr, r.x + 3, r.y + 2);
+		// Widget type label is intentionally not drawn to match actual LVGL appearance
 	}
 
 	private void drawButton(Graphics g, Rectangle r) {
-		// Draw button with 3D effect
+		// Draw button with 3D effect (full area, no type label space)
 		g.setBackgroundColor(ColorConstants.button);
-		g.fillRectangle(r.x + 2, r.y + 15, r.width - 4, r.height - 17);
+		g.fillRectangle(r.x + 2, r.y + 2, r.width - 4, r.height - 4);
 		g.setForegroundColor(ColorConstants.buttonDarker);
-		g.drawRectangle(r.x + 2, r.y + 15, r.width - 5, r.height - 18);
+		g.drawRectangle(r.x + 2, r.y + 2, r.width - 5, r.height - 5);
 
-		// Draw text
+		// Draw text centered
 		if (!text.isEmpty()) {
 			g.setForegroundColor(ColorConstants.black);
 			int textWidth = g.getFontMetrics().getAverageCharWidth() * text.length();
 			int textX = r.x + (r.width - textWidth) / 2;
-			int textY = r.y + r.height / 2;
+			int textY = r.y + (r.height - g.getFontMetrics().getHeight()) / 2;
 			g.drawString(text, textX, textY);
 		}
 	}
 
 	private void drawLabel(Graphics g, Rectangle r) {
+		// Draw label text
 		if (!text.isEmpty()) {
 			g.setForegroundColor(ColorConstants.black);
-			g.drawString(text, r.x + 5, r.y + 18);
+			g.drawString(text, r.x + 5, r.y + (r.height - g.getFontMetrics().getHeight()) / 2);
 		}
 	}
 
@@ -186,9 +199,9 @@ public class LvglWidgetFigure extends Figure {
 	}
 
 	private void drawSwitch(Graphics g, Rectangle r) {
-		int centerY = r.y + r.height / 2 + 5;
-		int switchWidth = 40;
-		int switchHeight = 20;
+		int centerY = r.y + r.height / 2;
+		int switchWidth = Math.min(40, r.width - 10);
+		int switchHeight = Math.min(20, r.height - 4);
 		int switchX = r.x + (r.width - switchWidth) / 2;
 
 		// Draw track
@@ -201,8 +214,8 @@ public class LvglWidgetFigure extends Figure {
 	}
 
 	private void drawCheckbox(Graphics g, Rectangle r) {
-		int boxSize = 16;
-		int boxY = r.y + 18;
+		int boxSize = Math.min(16, Math.min(r.width - 10, r.height - 4));
+		int boxY = r.y + (r.height - boxSize) / 2;
 
 		// Draw checkbox
 		g.setBackgroundColor(ColorConstants.white);
@@ -213,48 +226,48 @@ public class LvglWidgetFigure extends Figure {
 		// Draw checkmark
 		g.setLineStyle(SWT.LINE_SOLID);
 		g.setLineWidth(2);
-		g.drawLine(r.x + 8, boxY + 8, r.x + 12, boxY + 12);
-		g.drawLine(r.x + 12, boxY + 12, r.x + 18, boxY + 4);
+		g.drawLine(r.x + 8, boxY + boxSize / 2, r.x + 5 + boxSize / 2, boxY + boxSize - 4);
+		g.drawLine(r.x + 5 + boxSize / 2, boxY + boxSize - 4, r.x + 5 + boxSize - 2, boxY + 4);
 		g.setLineWidth(1);
 
 		// Draw text
 		if (!text.isEmpty()) {
-			g.drawString(text, r.x + 25, boxY);
+			g.drawString(text, r.x + boxSize + 10, boxY);
 		}
 	}
 
 	private void drawDropdown(Graphics g, Rectangle r) {
 		// Draw dropdown box
 		g.setBackgroundColor(ColorConstants.white);
-		g.fillRectangle(r.x + 3, r.y + 16, r.width - 6, r.height - 19);
+		g.fillRectangle(r.x + 3, r.y + 3, r.width - 6, r.height - 6);
 		g.setForegroundColor(ColorConstants.black);
-		g.drawRectangle(r.x + 3, r.y + 16, r.width - 7, r.height - 20);
+		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
 
 		// Draw arrow
 		int arrowX = r.x + r.width - 15;
-		int arrowY = r.y + r.height / 2 + 5;
-		g.drawLine(arrowX, arrowY, arrowX + 5, arrowY + 5);
-		g.drawLine(arrowX + 5, arrowY + 5, arrowX + 10, arrowY);
+		int arrowY = r.y + r.height / 2;
+		g.drawLine(arrowX, arrowY - 2, arrowX + 5, arrowY + 3);
+		g.drawLine(arrowX + 5, arrowY + 3, arrowX + 10, arrowY - 2);
 	}
 
 	private void drawTextarea(Graphics g, Rectangle r) {
 		// Draw text area
 		g.setBackgroundColor(ColorConstants.white);
-		g.fillRectangle(r.x + 3, r.y + 16, r.width - 6, r.height - 19);
+		g.fillRectangle(r.x + 3, r.y + 3, r.width - 6, r.height - 6);
 		g.setForegroundColor(ColorConstants.black);
-		g.drawRectangle(r.x + 3, r.y + 16, r.width - 7, r.height - 20);
+		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
 
 		// Draw placeholder lines
 		g.setForegroundColor(ColorConstants.lightGray);
-		for (int i = 0; i < 3 && (r.y + 25 + i * 15) < (r.y + r.height - 10); i++) {
-			g.drawLine(r.x + 8, r.y + 25 + i * 15, r.x + r.width - 20, r.y + 25 + i * 15);
+		for (int i = 0; i < 3 && (r.y + 10 + i * 15) < (r.y + r.height - 10); i++) {
+			g.drawLine(r.x + 8, r.y + 10 + i * 15, r.x + r.width - 12, r.y + 10 + i * 15);
 		}
 	}
 
 	private void drawArc(Graphics g, Rectangle r) {
 		int centerX = r.x + r.width / 2;
-		int centerY = r.y + r.height / 2 + 5;
-		int radius = Math.min(r.width, r.height - 15) / 2 - 5;
+		int centerY = r.y + r.height / 2;
+		int radius = Math.min(r.width, r.height) / 2 - 8;
 
 		// Draw arc background
 		g.setForegroundColor(ColorConstants.lightGray);
@@ -268,8 +281,8 @@ public class LvglWidgetFigure extends Figure {
 	}
 
 	private void drawBar(Graphics g, Rectangle r) {
-		int barHeight = 10;
-		int barY = r.y + r.height / 2 + 3;
+		int barHeight = Math.min(10, r.height - 4);
+		int barY = r.y + (r.height - barHeight) / 2;
 
 		// Draw background
 		g.setBackgroundColor(ColorConstants.lightGray);
@@ -283,14 +296,14 @@ public class LvglWidgetFigure extends Figure {
 	private void drawImage(Graphics g, Rectangle r) {
 		// Draw image placeholder
 		g.setBackgroundColor(ColorConstants.lightGray);
-		g.fillRectangle(r.x + 3, r.y + 16, r.width - 6, r.height - 19);
+		g.fillRectangle(r.x + 3, r.y + 3, r.width - 6, r.height - 6);
 		g.setForegroundColor(ColorConstants.gray);
-		g.drawRectangle(r.x + 3, r.y + 16, r.width - 7, r.height - 20);
+		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
 
-		// Draw image icon
-		int iconSize = Math.min(r.width - 20, r.height - 30);
+		// Draw image icon (mountain landscape)
+		int iconSize = Math.min(r.width - 20, r.height - 20);
 		int iconX = r.x + (r.width - iconSize) / 2;
-		int iconY = r.y + 16 + (r.height - 19 - iconSize) / 2;
+		int iconY = r.y + (r.height - iconSize) / 2;
 
 		g.drawLine(iconX, iconY + iconSize, iconX + iconSize / 3, iconY + iconSize / 2);
 		g.drawLine(iconX + iconSize / 3, iconY + iconSize / 2, iconX + iconSize * 2 / 3, iconY + iconSize * 2 / 3);
@@ -301,7 +314,23 @@ public class LvglWidgetFigure extends Figure {
 		// Draw dashed border for container
 		g.setForegroundColor(ColorConstants.gray);
 		g.setLineStyle(SWT.LINE_DASH);
-		g.drawRectangle(r.x + 3, r.y + 16, r.width - 7, r.height - 20);
+		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
 		g.setLineStyle(SWT.LINE_SOLID);
+	}
+
+	private void drawDefault(Graphics g, Rectangle r) {
+		// Draw a simple box for unknown widget types
+		g.setForegroundColor(ColorConstants.gray);
+		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
+	}
+
+	/**
+	 * Dispose of any resources created by this figure.
+	 */
+	public void dispose() {
+		if (bgColorInstance != null && !bgColorInstance.isDisposed()) {
+			bgColorInstance.dispose();
+			bgColorInstance = null;
+		}
 	}
 }

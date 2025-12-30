@@ -14,6 +14,8 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 
@@ -27,6 +29,7 @@ public class LvglContainerFigure extends Figure {
 	private LvglWidget.WidgetType widgetType = LvglWidget.WidgetType.CONTAINER;
 	private String text = "";
 	private int bgColor = 0xFFFFFF;
+	private Color bgColorInstance;
 
 	public LvglContainerFigure() {
 		setLayoutManager(new FreeformLayout());
@@ -59,6 +62,15 @@ public class LvglContainerFigure extends Figure {
 
 	public void setWidgetBgColor(int color) {
 		this.bgColor = color;
+		// Dispose old color if we created one
+		if (bgColorInstance != null && !bgColorInstance.isDisposed()) {
+			bgColorInstance.dispose();
+		}
+		// Create new color from hex value
+		int r = (color >> 16) & 0xFF;
+		int g = (color >> 8) & 0xFF;
+		int b = color & 0xFF;
+		bgColorInstance = new Color(Display.getCurrent(), r, g, b);
 		repaint();
 	}
 
@@ -66,8 +78,12 @@ public class LvglContainerFigure extends Figure {
 	protected void paintFigure(Graphics g) {
 		Rectangle r = getBounds().getCopy();
 
-		// Draw background
-		g.setBackgroundColor(ColorConstants.white);
+		// Draw background using the configured bgColor
+		if (bgColorInstance != null && !bgColorInstance.isDisposed()) {
+			g.setBackgroundColor(bgColorInstance);
+		} else {
+			g.setBackgroundColor(ColorConstants.white);
+		}
 		g.fillRectangle(r);
 
 		// Draw dashed border
@@ -76,18 +92,29 @@ public class LvglContainerFigure extends Figure {
 		g.drawRectangle(r.x, r.y, r.width - 1, r.height - 1);
 		g.setLineStyle(SWT.LINE_SOLID);
 
-		// Draw container label at top
-		g.setForegroundColor(ColorConstants.darkGray);
-		String typeStr = "[" + widgetType.getDisplayName() + "]";
-		g.drawString(typeStr, r.x + 3, r.y + 2);
-
-		// Draw widget name
+		// Draw widget name only (no type label for LVGL-like appearance)
 		g.setForegroundColor(ColorConstants.black);
-		g.drawString(nameLabel.getText(), r.x + 3, r.y + 15);
+		g.drawString(nameLabel.getText(), r.x + 3, r.y + 3);
+
+		// Draw text content if present
+		if (text != null && !text.isEmpty()) {
+			g.setForegroundColor(ColorConstants.darkGray);
+			g.drawString(text, r.x + 5, r.y + 18);
+		}
 	}
 
 	@Override
 	public boolean containsPoint(int x, int y) {
 		return getBounds().contains(x, y);
+	}
+
+	/**
+	 * Dispose of any resources created by this figure.
+	 */
+	public void dispose() {
+		if (bgColorInstance != null && !bgColorInstance.isDisposed()) {
+			bgColorInstance.dispose();
+			bgColorInstance = null;
+		}
 	}
 }

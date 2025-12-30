@@ -104,6 +104,11 @@ public class ClassNodeFigure extends Figure {
 
 	/**
 	 * Custom LineBorder that supports individual border sides.
+	 * <p>
+	 * This border is used to draw UML-style class diagrams where different
+	 * border widths are needed for each side. For example, a bottom-only border
+	 * is used to separate the class name from attributes, and attributes from methods.
+	 * </p>
 	 */
 	private static class LineBorder extends org.eclipse.draw2d.LineBorder {
 		private int top, left, bottom, right;
