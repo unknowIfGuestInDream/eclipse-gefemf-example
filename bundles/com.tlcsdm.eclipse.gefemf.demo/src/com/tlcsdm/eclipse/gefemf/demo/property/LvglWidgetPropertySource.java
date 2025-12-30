@@ -51,6 +51,31 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	private static final String CATEGORY_IMAGE = "Image";
 	private static final String CATEGORY_LAYOUT = "Layout";
 
+	// Cached label arrays for dropdown properties
+	private static final String[] LAYOUT_TYPE_LABELS;
+	private static final String[] FLEX_FLOW_LABELS;
+	private static final String[] FLEX_ALIGN_LABELS;
+
+	static {
+		LvglWidget.LayoutType[] layoutTypes = LvglWidget.LayoutType.values();
+		LAYOUT_TYPE_LABELS = new String[layoutTypes.length];
+		for (int i = 0; i < layoutTypes.length; i++) {
+			LAYOUT_TYPE_LABELS[i] = layoutTypes[i].getDisplayName();
+		}
+
+		LvglWidget.FlexFlow[] flexFlows = LvglWidget.FlexFlow.values();
+		FLEX_FLOW_LABELS = new String[flexFlows.length];
+		for (int i = 0; i < flexFlows.length; i++) {
+			FLEX_FLOW_LABELS[i] = flexFlows[i].getDisplayName();
+		}
+
+		LvglWidget.FlexAlign[] flexAligns = LvglWidget.FlexAlign.values();
+		FLEX_ALIGN_LABELS = new String[flexAligns.length];
+		for (int i = 0; i < flexAligns.length; i++) {
+			FLEX_ALIGN_LABELS[i] = flexAligns[i].getDisplayName();
+		}
+	}
+
 	private final LvglWidget widget;
 
 	public LvglWidgetPropertySource(LvglWidget widget) {
@@ -132,43 +157,31 @@ public class LvglWidgetPropertySource implements IPropertySource {
 		// Layout properties (only show for Container widgets)
 		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
 			// Layout Type dropdown
-			String[] layoutTypeLabels = new String[LvglWidget.LayoutType.values().length];
-			for (int i = 0; i < LvglWidget.LayoutType.values().length; i++) {
-				layoutTypeLabels[i] = LvglWidget.LayoutType.values()[i].getDisplayName();
-			}
-			ComboBoxPropertyDescriptor layoutTypeDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_LAYOUT_TYPE, "Layout Type", layoutTypeLabels);
+			ComboBoxPropertyDescriptor layoutTypeDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_LAYOUT_TYPE, "Layout Type", LAYOUT_TYPE_LABELS);
 			layoutTypeDescriptor.setCategory(CATEGORY_LAYOUT);
 			layoutTypeDescriptor.setDescription("Layout type for the container");
 			descriptors.add(layoutTypeDescriptor);
 
 			// Flex Flow dropdown
-			String[] flexFlowLabels = new String[LvglWidget.FlexFlow.values().length];
-			for (int i = 0; i < LvglWidget.FlexFlow.values().length; i++) {
-				flexFlowLabels[i] = LvglWidget.FlexFlow.values()[i].getDisplayName();
-			}
-			ComboBoxPropertyDescriptor flexFlowDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_FLOW, "Flex Flow", flexFlowLabels);
+			ComboBoxPropertyDescriptor flexFlowDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_FLOW, "Flex Flow", FLEX_FLOW_LABELS);
 			flexFlowDescriptor.setCategory(CATEGORY_LAYOUT);
 			flexFlowDescriptor.setDescription("Flex flow direction");
 			descriptors.add(flexFlowDescriptor);
 
 			// Flex Main Align dropdown
-			String[] flexAlignLabels = new String[LvglWidget.FlexAlign.values().length];
-			for (int i = 0; i < LvglWidget.FlexAlign.values().length; i++) {
-				flexAlignLabels[i] = LvglWidget.FlexAlign.values()[i].getDisplayName();
-			}
-			ComboBoxPropertyDescriptor flexMainAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_MAIN_ALIGN, "Flex Main Align", flexAlignLabels);
+			ComboBoxPropertyDescriptor flexMainAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_MAIN_ALIGN, "Flex Main Align", FLEX_ALIGN_LABELS);
 			flexMainAlignDescriptor.setCategory(CATEGORY_LAYOUT);
 			flexMainAlignDescriptor.setDescription("Main axis alignment");
 			descriptors.add(flexMainAlignDescriptor);
 
 			// Flex Cross Align dropdown
-			ComboBoxPropertyDescriptor flexCrossAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_CROSS_ALIGN, "Flex Cross Align", flexAlignLabels);
+			ComboBoxPropertyDescriptor flexCrossAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_CROSS_ALIGN, "Flex Cross Align", FLEX_ALIGN_LABELS);
 			flexCrossAlignDescriptor.setCategory(CATEGORY_LAYOUT);
 			flexCrossAlignDescriptor.setDescription("Cross axis alignment");
 			descriptors.add(flexCrossAlignDescriptor);
 
 			// Flex Track Align dropdown
-			ComboBoxPropertyDescriptor flexTrackAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_TRACK_ALIGN, "Flex Track Align", flexAlignLabels);
+			ComboBoxPropertyDescriptor flexTrackAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_TRACK_ALIGN, "Flex Track Align", FLEX_ALIGN_LABELS);
 			flexTrackAlignDescriptor.setCategory(CATEGORY_LAYOUT);
 			flexTrackAlignDescriptor.setDescription("Track alignment for wrapped content");
 			descriptors.add(flexTrackAlignDescriptor);
