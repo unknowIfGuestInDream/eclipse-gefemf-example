@@ -6,8 +6,22 @@ name: Eclipse Tycho build with Maven
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'bundles/**'
+      - 'features/**'
+      - 'sites/**'
+      - 'pom.xml'
+      - 'target-platform.target'
+      - '.mvn/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'bundles/**'
+      - 'features/**'
+      - 'sites/**'
+      - 'pom.xml'
+      - 'target-platform.target'
+      - '.mvn/**'
 
 jobs:
   build:

@@ -3,6 +3,13 @@ name: Artifact
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'bundles/**'
+      - 'features/**'
+      - 'sites/**'
+      - 'pom.xml'
+      - 'target-platform.target'
+      - '.mvn/**'
 
 permissions:
   contents: read
