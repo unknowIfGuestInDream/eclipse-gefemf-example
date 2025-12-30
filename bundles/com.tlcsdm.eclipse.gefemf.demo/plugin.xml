@@ -19,6 +19,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditor"
+            contributorClass="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditorActionBarContributor"
             default="true"
             extensions="gefxml"
             icon="icons/sample.png"

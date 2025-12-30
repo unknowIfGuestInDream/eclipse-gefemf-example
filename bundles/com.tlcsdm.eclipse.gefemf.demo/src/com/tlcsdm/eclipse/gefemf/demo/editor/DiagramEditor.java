@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.commands.CommandStackListener;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithPalette;
@@ -37,7 +38,6 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 	public static final String ID = "com.tlcsdm.eclipse.gefemf.demo.editor";
 
 	private LvglScreen screen;
-	private boolean isDirty = false;
 
 	public DiagramEditor() {
 		setEditDomain(new DefaultEditDomain(this));
@@ -102,6 +102,14 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		GraphicalViewer viewer = getGraphicalViewer();
 		viewer.setEditPartFactory(new LvglEditPartFactory());
 		viewer.setRootEditPart(new ScalableFreeformRootEditPart());
+		
+		// Register as command stack listener to properly track dirty state
+		getCommandStack().addCommandStackListener(new CommandStackListener() {
+			@Override
+			public void commandStackChanged(EventObject event) {
+				DiagramEditor.this.commandStackChanged(event);
+			}
+		});
 	}
 
 	@Override
@@ -131,7 +139,6 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 				} else {
 					file.create(bais, true, monitor);
 				}
-				isDirty = false;
 				getCommandStack().markSaveLocation();
 				firePropertyChange(PROP_DIRTY);
 			} catch (Exception e) {
@@ -152,12 +159,11 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 
 	@Override
 	public boolean isDirty() {
-		return isDirty || getCommandStack().isDirty();
+		return getCommandStack().isDirty();
 	}
 
 	@Override
 	public void commandStackChanged(EventObject event) {
-		isDirty = true;
 		firePropertyChange(PROP_DIRTY);
 		super.updateActions(getStackActions());
 	}

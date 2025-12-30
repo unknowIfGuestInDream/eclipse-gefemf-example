@@ -17,9 +17,11 @@ import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.model.ModelElement;
+import com.tlcsdm.eclipse.gefemf.demo.property.LvglScreenPropertySource;
 
 /**
  * EditPart for LVGL screen.
@@ -68,5 +70,14 @@ public class LvglScreenEditPart extends AbstractGraphicalEditPart implements Pro
 		if (ModelElement.PROPERTY_ADD.equals(prop) || ModelElement.PROPERTY_REMOVE.equals(prop)) {
 			refreshChildren();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
+		if (adapter == IPropertySource.class) {
+			return (T) new LvglScreenPropertySource((LvglScreen) getModel());
+		}
+		return super.getAdapter(adapter);
 	}
 }
