@@ -63,8 +63,8 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * Wizard page for creating a new LVGL UI file using the standard Eclipse file
-	 * creation page which provides container browsing capability.
+	 * Wizard page implementation extending WizardNewFileCreationPage for creating
+	 * new LVGL UI files with container browsing capability.
 	 */
 	private static class NewDiagramWizardPage extends WizardNewFileCreationPage {
 
@@ -89,12 +89,12 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 			LvglXmlSerializer serializer = new LvglXmlSerializer();
 			try {
 				serializer.save(screen, baos);
+				return new ByteArrayInputStream(baos.toByteArray());
 			} catch (Exception e) {
+				// Return empty content if serialization fails
 				e.printStackTrace();
-				return null;
+				return new ByteArrayInputStream(new byte[0]);
 			}
-
-			return new ByteArrayInputStream(baos.toByteArray());
 		}
 
 		@Override
