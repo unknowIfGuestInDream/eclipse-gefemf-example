@@ -85,11 +85,6 @@
           <version>${tycho.version}</version>
         </plugin>
         <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-p2-director-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>${maven-clean-plugin.version}</version>
         </plugin>
@@ -140,7 +135,6 @@
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho.version}</version>
         <configuration>
-          <executionEnvironment>org.eclipse.justj.openjdk.hotspot.jre.full-21</executionEnvironment>
           <target>
             <file>${target.file}</file>
           </target>
@@ -227,29 +221,10 @@
       </plugin>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-director-plugin</artifactId>
-        <configuration>
-          <formats>
-            <win32>zip</win32>
-            <linux>tar.gz</linux>
-            <macosx>tar.gz</macosx>
-          </formats>
-          <products>
-            <product>
-              <id>com.tlcsdm.eclipse.gefemf.demo.product</id>
-              <attachId>com.tlcsdm.eclipse.gefemf.demo.product</attachId>
-              <rootFolder>eclipse</rootFolder>
-            </product>
-          </products>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
           <useUIThread>true</useUIThread>
           <useUIHarness>true</useUIHarness>
-          <application>com.tlcsdm.eclipse.gefemf.demo.application</application>
           <argLine>-Dfile.encoding=UTF-8</argLine>
           <includes>
             <include>**/*Test.*</include>
