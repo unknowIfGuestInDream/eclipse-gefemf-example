@@ -51,28 +51,30 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	private static final String CATEGORY_IMAGE = "Image";
 	private static final String CATEGORY_LAYOUT = "Layout";
 
+	// Cached enum values arrays for dropdown properties
+	private static final LvglWidget.LayoutType[] LAYOUT_TYPES = LvglWidget.LayoutType.values();
+	private static final LvglWidget.FlexFlow[] FLEX_FLOWS = LvglWidget.FlexFlow.values();
+	private static final LvglWidget.FlexAlign[] FLEX_ALIGNS = LvglWidget.FlexAlign.values();
+
 	// Cached label arrays for dropdown properties
 	private static final String[] LAYOUT_TYPE_LABELS;
 	private static final String[] FLEX_FLOW_LABELS;
 	private static final String[] FLEX_ALIGN_LABELS;
 
 	static {
-		LvglWidget.LayoutType[] layoutTypes = LvglWidget.LayoutType.values();
-		LAYOUT_TYPE_LABELS = new String[layoutTypes.length];
-		for (int i = 0; i < layoutTypes.length; i++) {
-			LAYOUT_TYPE_LABELS[i] = layoutTypes[i].getDisplayName();
+		LAYOUT_TYPE_LABELS = new String[LAYOUT_TYPES.length];
+		for (int i = 0; i < LAYOUT_TYPES.length; i++) {
+			LAYOUT_TYPE_LABELS[i] = LAYOUT_TYPES[i].getDisplayName();
 		}
 
-		LvglWidget.FlexFlow[] flexFlows = LvglWidget.FlexFlow.values();
-		FLEX_FLOW_LABELS = new String[flexFlows.length];
-		for (int i = 0; i < flexFlows.length; i++) {
-			FLEX_FLOW_LABELS[i] = flexFlows[i].getDisplayName();
+		FLEX_FLOW_LABELS = new String[FLEX_FLOWS.length];
+		for (int i = 0; i < FLEX_FLOWS.length; i++) {
+			FLEX_FLOW_LABELS[i] = FLEX_FLOWS[i].getDisplayName();
 		}
 
-		LvglWidget.FlexAlign[] flexAligns = LvglWidget.FlexAlign.values();
-		FLEX_ALIGN_LABELS = new String[flexAligns.length];
-		for (int i = 0; i < flexAligns.length; i++) {
-			FLEX_ALIGN_LABELS[i] = flexAligns[i].getDisplayName();
+		FLEX_ALIGN_LABELS = new String[FLEX_ALIGNS.length];
+		for (int i = 0; i < FLEX_ALIGNS.length; i++) {
+			FLEX_ALIGN_LABELS[i] = FLEX_ALIGNS[i].getDisplayName();
 		}
 	}
 
@@ -348,37 +350,32 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			break;
 		case PROPERTY_LAYOUT_TYPE:
 			int layoutIndex = ((Integer) value).intValue();
-			LvglWidget.LayoutType[] layoutTypes = LvglWidget.LayoutType.values();
-			if (layoutIndex >= 0 && layoutIndex < layoutTypes.length) {
-				widget.setLayoutType(layoutTypes[layoutIndex]);
+			if (layoutIndex >= 0 && layoutIndex < LAYOUT_TYPES.length) {
+				widget.setLayoutType(LAYOUT_TYPES[layoutIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_FLOW:
 			int flowIndex = ((Integer) value).intValue();
-			LvglWidget.FlexFlow[] flexFlows = LvglWidget.FlexFlow.values();
-			if (flowIndex >= 0 && flowIndex < flexFlows.length) {
-				widget.setFlexFlow(flexFlows[flowIndex]);
+			if (flowIndex >= 0 && flowIndex < FLEX_FLOWS.length) {
+				widget.setFlexFlow(FLEX_FLOWS[flowIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_MAIN_ALIGN:
 			int mainAlignIndex = ((Integer) value).intValue();
-			LvglWidget.FlexAlign[] flexAligns = LvglWidget.FlexAlign.values();
-			if (mainAlignIndex >= 0 && mainAlignIndex < flexAligns.length) {
-				widget.setFlexMainAlign(flexAligns[mainAlignIndex]);
+			if (mainAlignIndex >= 0 && mainAlignIndex < FLEX_ALIGNS.length) {
+				widget.setFlexMainAlign(FLEX_ALIGNS[mainAlignIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_CROSS_ALIGN:
 			int crossAlignIndex = ((Integer) value).intValue();
-			LvglWidget.FlexAlign[] crossAligns = LvglWidget.FlexAlign.values();
-			if (crossAlignIndex >= 0 && crossAlignIndex < crossAligns.length) {
-				widget.setFlexCrossAlign(crossAligns[crossAlignIndex]);
+			if (crossAlignIndex >= 0 && crossAlignIndex < FLEX_ALIGNS.length) {
+				widget.setFlexCrossAlign(FLEX_ALIGNS[crossAlignIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_TRACK_ALIGN:
 			int trackAlignIndex = ((Integer) value).intValue();
-			LvglWidget.FlexAlign[] trackAligns = LvglWidget.FlexAlign.values();
-			if (trackAlignIndex >= 0 && trackAlignIndex < trackAligns.length) {
-				widget.setFlexTrackAlign(trackAligns[trackAlignIndex]);
+			if (trackAlignIndex >= 0 && trackAlignIndex < FLEX_ALIGNS.length) {
+				widget.setFlexTrackAlign(FLEX_ALIGNS[trackAlignIndex]);
 			}
 			break;
 		case PROPERTY_PAD_ROW:
