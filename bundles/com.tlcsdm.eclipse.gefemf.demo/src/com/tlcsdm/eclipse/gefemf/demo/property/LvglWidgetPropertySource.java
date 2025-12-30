@@ -127,13 +127,13 @@ public class LvglWidgetPropertySource implements IPropertySource {
 		case PROPERTY_HEIGHT:
 			return String.valueOf(widget.getBounds().height);
 		case PROPERTY_BG_COLOR:
-			return formatColor(widget.getBgColor());
+			return PropertyUtils.formatColor(widget.getBgColor());
 		case PROPERTY_TEXT_COLOR:
-			return formatColor(widget.getTextColor());
+			return PropertyUtils.formatColor(widget.getTextColor());
 		case PROPERTY_BORDER_WIDTH:
 			return String.valueOf(widget.getBorderWidth());
 		case PROPERTY_BORDER_COLOR:
-			return formatColor(widget.getBorderColor());
+			return PropertyUtils.formatColor(widget.getBorderColor());
 		case PROPERTY_RADIUS:
 			return String.valueOf(widget.getRadius());
 		default:
@@ -199,19 +199,19 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			setHeight(strValue);
 			break;
 		case PROPERTY_BG_COLOR:
-			widget.setBgColor(parseColor(strValue));
+			widget.setBgColor(PropertyUtils.parseColor(strValue));
 			break;
 		case PROPERTY_TEXT_COLOR:
-			widget.setTextColor(parseColor(strValue));
+			widget.setTextColor(PropertyUtils.parseColor(strValue));
 			break;
 		case PROPERTY_BORDER_WIDTH:
-			widget.setBorderWidth(parseInt(strValue, 0));
+			widget.setBorderWidth(PropertyUtils.parseInt(strValue, 0));
 			break;
 		case PROPERTY_BORDER_COLOR:
-			widget.setBorderColor(parseColor(strValue));
+			widget.setBorderColor(PropertyUtils.parseColor(strValue));
 			break;
 		case PROPERTY_RADIUS:
-			widget.setRadius(parseInt(strValue, 0));
+			widget.setRadius(PropertyUtils.parseInt(strValue, 0));
 			break;
 		default:
 			break;
@@ -219,63 +219,32 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	}
 
 	private void setX(String value) {
-		int x = parseInt(value, widget.getBounds().x);
-		var bounds = widget.getBounds().getCopy();
-		bounds.x = x;
-		widget.setBounds(bounds);
+		int x = PropertyUtils.parseInt(value, widget.getBounds().x);
+		updateBounds(bounds -> bounds.x = x);
 	}
 
 	private void setY(String value) {
-		int y = parseInt(value, widget.getBounds().y);
-		var bounds = widget.getBounds().getCopy();
-		bounds.y = y;
-		widget.setBounds(bounds);
+		int y = PropertyUtils.parseInt(value, widget.getBounds().y);
+		updateBounds(bounds -> bounds.y = y);
 	}
 
 	private void setWidth(String value) {
-		int width = parseInt(value, widget.getBounds().width);
+		int width = PropertyUtils.parseInt(value, widget.getBounds().width);
 		if (width > 0) {
-			var bounds = widget.getBounds().getCopy();
-			bounds.width = width;
-			widget.setBounds(bounds);
+			updateBounds(bounds -> bounds.width = width);
 		}
 	}
 
 	private void setHeight(String value) {
-		int height = parseInt(value, widget.getBounds().height);
+		int height = PropertyUtils.parseInt(value, widget.getBounds().height);
 		if (height > 0) {
-			var bounds = widget.getBounds().getCopy();
-			bounds.height = height;
-			widget.setBounds(bounds);
+			updateBounds(bounds -> bounds.height = height);
 		}
 	}
 
-	private String formatColor(int color) {
-		return String.format("#%06X", color & 0xFFFFFF);
-	}
-
-	private int parseColor(String colorStr) {
-		if (colorStr == null || colorStr.isEmpty()) {
-			return 0xFFFFFF;
-		}
-		if (colorStr.startsWith("#")) {
-			colorStr = colorStr.substring(1);
-		}
-		try {
-			return Integer.parseInt(colorStr, 16);
-		} catch (NumberFormatException e) {
-			return 0xFFFFFF;
-		}
-	}
-
-	private int parseInt(String str, int defaultValue) {
-		if (str == null || str.isEmpty()) {
-			return defaultValue;
-		}
-		try {
-			return Integer.parseInt(str);
-		} catch (NumberFormatException e) {
-			return defaultValue;
-		}
+	private void updateBounds(java.util.function.Consumer<org.eclipse.draw2d.geometry.Rectangle> modifier) {
+		var bounds = widget.getBounds().getCopy();
+		modifier.accept(bounds);
+		widget.setBounds(bounds);
 	}
 }

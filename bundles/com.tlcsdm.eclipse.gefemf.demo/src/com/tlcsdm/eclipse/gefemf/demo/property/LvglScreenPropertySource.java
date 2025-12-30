@@ -74,7 +74,7 @@ public class LvglScreenPropertySource implements IPropertySource {
 		case PROPERTY_HEIGHT:
 			return String.valueOf(screen.getHeight());
 		case PROPERTY_BG_COLOR:
-			return formatColor(screen.getBgColor());
+			return PropertyUtils.formatColor(screen.getBgColor());
 		default:
 			return null;
 		}
@@ -113,51 +113,22 @@ public class LvglScreenPropertySource implements IPropertySource {
 			screen.setName(strValue);
 			break;
 		case PROPERTY_WIDTH:
-			int width = parseInt(strValue, screen.getWidth());
+			int width = PropertyUtils.parseInt(strValue, screen.getWidth());
 			if (width > 0) {
 				screen.setWidth(width);
 			}
 			break;
 		case PROPERTY_HEIGHT:
-			int height = parseInt(strValue, screen.getHeight());
+			int height = PropertyUtils.parseInt(strValue, screen.getHeight());
 			if (height > 0) {
 				screen.setHeight(height);
 			}
 			break;
 		case PROPERTY_BG_COLOR:
-			screen.setBgColor(parseColor(strValue));
+			screen.setBgColor(PropertyUtils.parseColor(strValue));
 			break;
 		default:
 			break;
-		}
-	}
-
-	private String formatColor(int color) {
-		return String.format("#%06X", color & 0xFFFFFF);
-	}
-
-	private int parseColor(String colorStr) {
-		if (colorStr == null || colorStr.isEmpty()) {
-			return 0xFFFFFF;
-		}
-		if (colorStr.startsWith("#")) {
-			colorStr = colorStr.substring(1);
-		}
-		try {
-			return Integer.parseInt(colorStr, 16);
-		} catch (NumberFormatException e) {
-			return 0xFFFFFF;
-		}
-	}
-
-	private int parseInt(String str, int defaultValue) {
-		if (str == null || str.isEmpty()) {
-			return defaultValue;
-		}
-		try {
-			return Integer.parseInt(str);
-		} catch (NumberFormatException e) {
-			return defaultValue;
 		}
 	}
 }

@@ -45,6 +45,9 @@ public class GenerateCodeAction extends Action {
 
 	@Override
 	public void run() {
+		if (window.getActivePage() == null) {
+			return;
+		}
 		IEditorPart editor = window.getActivePage().getActiveEditor();
 
 		if (!(editor instanceof DiagramEditor)) {
@@ -70,37 +73,40 @@ public class GenerateCodeAction extends Action {
 		// Save generated files
 		try {
 			IFile diagramFile = (IFile) diagramEditor.getEditorInput().getAdapter(IFile.class);
-			if (diagramFile != null) {
-				IProject project = diagramFile.getProject();
-				IFolder srcGenFolder = project.getFolder("src-gen");
-
-				if (!srcGenFolder.exists()) {
-					srcGenFolder.create(true, true, new NullProgressMonitor());
-				}
-
-				// Generate header file
-				IFile headerFile = srcGenFolder.getFile(screen.getName() + ".h");
-				ByteArrayInputStream headerSource = new ByteArrayInputStream(headerCode.getBytes("UTF-8"));
-				if (headerFile.exists()) {
-					headerFile.setContents(headerSource, true, true, new NullProgressMonitor());
-				} else {
-					headerFile.create(headerSource, true, new NullProgressMonitor());
-				}
-
-				// Generate source file
-				IFile sourceFile = srcGenFolder.getFile(screen.getName() + ".c");
-				ByteArrayInputStream cSource = new ByteArrayInputStream(sourceCode.getBytes("UTF-8"));
-				if (sourceFile.exists()) {
-					sourceFile.setContents(cSource, true, true, new NullProgressMonitor());
-				} else {
-					sourceFile.create(cSource, true, new NullProgressMonitor());
-				}
-
-				MessageDialog.openInformation(window.getShell(), "Code Generated",
-						"Successfully generated LVGL C code:\n" + srcGenFolder.getFullPath().toString() + "/"
-								+ screen.getName() + ".h\n" + srcGenFolder.getFullPath().toString() + "/"
-								+ screen.getName() + ".c");
+			if (diagramFile == null) {
+				MessageDialog.openError(window.getShell(), "Error",
+						"Cannot access the diagram file. Please save the file first.");
+				return;
 			}
+			IProject project = diagramFile.getProject();
+			IFolder srcGenFolder = project.getFolder("src-gen");
+
+			if (!srcGenFolder.exists()) {
+				srcGenFolder.create(true, true, new NullProgressMonitor());
+			}
+
+			// Generate header file
+			IFile headerFile = srcGenFolder.getFile(screen.getName() + ".h");
+			ByteArrayInputStream headerSource = new ByteArrayInputStream(headerCode.getBytes("UTF-8"));
+			if (headerFile.exists()) {
+				headerFile.setContents(headerSource, true, true, new NullProgressMonitor());
+			} else {
+				headerFile.create(headerSource, true, new NullProgressMonitor());
+			}
+
+			// Generate source file
+			IFile sourceFile = srcGenFolder.getFile(screen.getName() + ".c");
+			ByteArrayInputStream cSource = new ByteArrayInputStream(sourceCode.getBytes("UTF-8"));
+			if (sourceFile.exists()) {
+				sourceFile.setContents(cSource, true, true, new NullProgressMonitor());
+			} else {
+				sourceFile.create(cSource, true, new NullProgressMonitor());
+			}
+
+			MessageDialog.openInformation(window.getShell(), "Code Generated",
+					"Successfully generated LVGL C code:\n" + srcGenFolder.getFullPath().toString() + "/"
+							+ screen.getName() + ".h\n" + srcGenFolder.getFullPath().toString() + "/"
+							+ screen.getName() + ".c");
 		} catch (Exception e) {
 			MessageDialog.openError(window.getShell(), "Error",
 					"Failed to generate code: " + e.getMessage());
