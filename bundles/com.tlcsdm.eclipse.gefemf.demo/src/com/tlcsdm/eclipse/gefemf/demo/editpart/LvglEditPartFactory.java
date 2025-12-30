@@ -24,8 +24,13 @@ public class LvglEditPartFactory implements EditPartFactory {
 
 		if (model instanceof LvglScreen) {
 			part = new LvglScreenEditPart();
-		} else if (model instanceof LvglWidget) {
-			part = new LvglWidgetEditPart();
+		} else if (model instanceof LvglWidget widget) {
+			// Use container edit part for container widgets
+			if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
+				part = new LvglContainerEditPart();
+			} else {
+				part = new LvglWidgetEditPart();
+			}
 		} else if (model instanceof Connection) {
 			part = new ConnectionEditPart();
 		}
