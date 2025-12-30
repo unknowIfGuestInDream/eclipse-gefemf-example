@@ -8,6 +8,7 @@ package com.tlcsdm.eclipse.gefemf.demo.editor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -48,6 +49,7 @@ import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
  */
 public class DiagramMultiPageEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
+	/** Editor ID matching the id attribute in plugin.xml. Used for programmatic editor access. */
 	public static final String ID = "com.tlcsdm.eclipse.gefemf.demo.editor";
 	
 	/** Index of the UI design page */
@@ -237,7 +239,7 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 				String xmlContent = document.get();
 				if (xmlContent != null && !xmlContent.trim().isEmpty()) {
 					LvglXmlSerializer serializer = new LvglXmlSerializer();
-					ByteArrayInputStream bais = new ByteArrayInputStream(xmlContent.getBytes("UTF-8"));
+					ByteArrayInputStream bais = new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
 					LvglScreen newScreen = serializer.load(bais);
 					
 					// Update the graphical editor's model
@@ -266,7 +268,7 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 					if (documentListener != null) {
 						document.removeDocumentListener(documentListener);
 					}
-					document.set(baos.toString("UTF-8"));
+					document.set(baos.toString(StandardCharsets.UTF_8));
 					if (documentListener != null) {
 						document.addDocumentListener(documentListener);
 					}

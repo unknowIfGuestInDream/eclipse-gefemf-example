@@ -36,19 +36,18 @@ public class GenerateCodeHandler extends AbstractHandler {
 		IEditorPart editor = HandlerUtil.getActiveEditor(event);
 
 		LvglScreen screen = null;
-		IFile diagramFile = null;
 
 		if (editor instanceof DiagramMultiPageEditor multiPageEditor) {
 			screen = multiPageEditor.getScreen();
-			diagramFile = (IFile) multiPageEditor.getEditorInput().getAdapter(IFile.class);
 		} else if (editor instanceof DiagramEditor diagramEditor) {
 			screen = diagramEditor.getScreen();
-			diagramFile = (IFile) diagramEditor.getEditorInput().getAdapter(IFile.class);
 		} else {
 			ConsoleLogger.logWarning("Please open an LVGL UI editor first.");
 			ConsoleLogger.writeToConsole("Warning: Please open an LVGL UI editor first.");
 			return null;
 		}
+		
+		IFile diagramFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
 
 		if (screen == null || screen.getWidgets().isEmpty()) {
 			ConsoleLogger.logWarning("The screen is empty. Please add some widgets first.");
