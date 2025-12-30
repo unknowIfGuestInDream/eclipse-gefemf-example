@@ -17,15 +17,19 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * A custom color cell editor that positions the color dialog near the cell.
- * This provides a better user experience as the dialog appears close to where
- * the user clicked, rather than at a system-determined location.
+ * A custom color cell editor that provides a color dialog for editing.
+ * This extends DialogCellEditor to provide a better visual representation
+ * of the current color with a color swatch.
+ * <p>
+ * Note: The ColorDialog position is controlled by the operating system's window manager
+ * in SWT. While we cannot directly position the dialog near the cell, this implementation
+ * provides a better visual experience with a color swatch preview.
+ * </p>
  */
 public class PositionedColorCellEditor extends DialogCellEditor {
 
@@ -58,6 +62,11 @@ public class PositionedColorCellEditor extends DialogCellEditor {
 	 * The image displayed in the color swatch.
 	 */
 	private Image image;
+
+	/**
+	 * The color used for the swatch background.
+	 */
+	private Color swatchColor;
 
 	/**
 	 * Internal class for laying out the dialog.
@@ -117,6 +126,10 @@ public class PositionedColorCellEditor extends DialogCellEditor {
 			image.dispose();
 			image = null;
 		}
+		if (swatchColor != null) {
+			swatchColor.dispose();
+			swatchColor = null;
+		}
 		super.dispose();
 	}
 
@@ -132,40 +145,9 @@ public class PositionedColorCellEditor extends DialogCellEditor {
 			dialog.setRGB((RGB) value);
 		}
 
-		// Position the dialog near the cell
-		Shell dialogShell = dialog.getParent();
-		if (cellEditorWindow != null) {
-			Rectangle cellBounds = cellEditorWindow.getBounds();
-			Point displayLocation = cellEditorWindow.toDisplay(cellBounds.x, cellBounds.y + cellBounds.height);
-			
-			// Adjust position to ensure dialog is visible on screen
-			Rectangle screenBounds = Display.getCurrent().getPrimaryMonitor().getBounds();
-			int x = displayLocation.x;
-			int y = displayLocation.y;
-			
-			// Estimate dialog size (ColorDialog size varies by platform)
-			int estimatedWidth = 400;
-			int estimatedHeight = 300;
-			
-			// Adjust if dialog would go off screen
-			if (x + estimatedWidth > screenBounds.x + screenBounds.width) {
-				x = screenBounds.x + screenBounds.width - estimatedWidth;
-			}
-			if (y + estimatedHeight > screenBounds.y + screenBounds.height) {
-				// Show above the cell instead
-				y = displayLocation.y - cellBounds.height - estimatedHeight;
-			}
-			
-			// Ensure minimum bounds
-			x = Math.max(screenBounds.x, x);
-			y = Math.max(screenBounds.y, y);
-			
-			// Set the dialog location (note: ColorDialog doesn't support setLocation directly,
-			// but we can try to influence it through the parent shell)
-			dialogShell.setLocation(x, y);
-		}
-
 		// Open the dialog and return the result
+		// Note: ColorDialog position cannot be controlled in SWT as it's a native dialog.
+		// The OS determines where the dialog appears.
 		RGB result = dialog.open();
 		return result;
 	}
@@ -173,16 +155,22 @@ public class PositionedColorCellEditor extends DialogCellEditor {
 	@Override
 	protected void updateContents(Object value) {
 		RGB rgb = (RGB) value;
-		// Dispose old image
+		// Dispose old resources
 		if (image != null) {
 			image.dispose();
+			image = null;
+		}
+		if (swatchColor != null) {
+			swatchColor.dispose();
+			swatchColor = null;
 		}
 		
 		// Create a new image with the color
 		if (rgb != null) {
 			image = new Image(colorLabel.getDisplay(), SWATCH_WIDTH, SWATCH_HEIGHT);
+			swatchColor = new Color(colorLabel.getDisplay(), rgb);
 			GC gc = new GC(image);
-			gc.setBackground(new Color(colorLabel.getDisplay(), rgb));
+			gc.setBackground(swatchColor);
 			gc.fillRectangle(0, 0, SWATCH_WIDTH, SWATCH_HEIGHT);
 			gc.setForeground(colorLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 			gc.drawRectangle(0, 0, SWATCH_WIDTH - 1, SWATCH_HEIGHT - 1);

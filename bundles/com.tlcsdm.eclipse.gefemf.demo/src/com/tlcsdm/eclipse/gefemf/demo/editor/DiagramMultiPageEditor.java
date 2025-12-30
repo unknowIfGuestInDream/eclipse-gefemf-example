@@ -300,6 +300,9 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 	 */
 	private void refreshTextEditorAndSave(IProgressMonitor monitor) {
 		try {
+			if (textEditor == null || textEditor.getDocumentProvider() == null) {
+				return;
+			}
 			LvglScreen screen = graphicalEditor.getScreen();
 			if (screen != null) {
 				LvglXmlSerializer serializer = new LvglXmlSerializer();
@@ -316,12 +319,10 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 					if (documentListener != null) {
 						document.addDocumentListener(documentListener);
 					}
-					// Save the text editor to clear its dirty state
-					// This writes the content directly to the file (already done by graphicalEditor.doSave)
-					// We just need to reset the document provider's dirty state
+					// Reset the document provider by reloading content from the file.
+					// Since graphicalEditor.doSave() has already saved the XML to file,
+					// this reloads the saved content and clears the text editor's dirty state.
 					textEditor.getDocumentProvider().resetDocument(getEditorInput());
-					// Re-set the document content since resetDocument reloads from file
-					document = textEditor.getDocumentProvider().getDocument(getEditorInput());
 					// Reset xmlModified since content is now synchronized
 					xmlModified = false;
 				}

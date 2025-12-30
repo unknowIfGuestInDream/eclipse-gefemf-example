@@ -14,7 +14,11 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 /**
  * Property descriptor for color properties that provides a ColorDialog for editing.
  * This descriptor uses a custom PositionedColorCellEditor to allow users to select colors
- * through the Eclipse color dialog, which is positioned near the cell for better UX.
+ * through the Eclipse color dialog with a color swatch preview.
+ * <p>
+ * Note: The ColorDialog position is controlled by the operating system's window manager
+ * in SWT, so the dialog will appear at the system-determined location.
+ * </p>
  */
 public class ColorPropertyDescriptor extends PropertyDescriptor {
 
