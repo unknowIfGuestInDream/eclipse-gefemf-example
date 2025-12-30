@@ -104,6 +104,10 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		viewer.setEditPartFactory(new LvglEditPartFactory());
 		viewer.setRootEditPart(new ScalableFreeformRootEditPart());
 		
+		// Register the Generate LVGL Code action
+		GenerateLvglCodeAction generateAction = new GenerateLvglCodeAction(this);
+		getActionRegistry().registerAction(generateAction);
+		
 		// Add context menu for right-click delete and other actions
 		ContextMenuProvider contextMenuProvider = new DiagramContextMenuProvider(viewer, getActionRegistry());
 		viewer.setContextMenu(contextMenuProvider);

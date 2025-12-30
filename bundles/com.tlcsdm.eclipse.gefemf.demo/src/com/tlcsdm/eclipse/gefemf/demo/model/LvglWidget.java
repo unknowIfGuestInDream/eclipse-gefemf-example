@@ -30,7 +30,30 @@ public class LvglWidget extends ModelElement {
 		IMAGE("lv_img", "Image"),
 		ARC("lv_arc", "Arc"),
 		BAR("lv_bar", "Bar"),
-		CONTAINER("lv_obj", "Container");
+		CONTAINER("lv_obj", "Container"),
+		// Additional LVGL widgets from official documentation
+		ANIMIMG("lv_animimg", "Animation Image"),
+		ARCLABEL("lv_arclabel", "Arc Label"),
+		BUTTONMATRIX("lv_btnmatrix", "Button Matrix"),
+		CALENDAR("lv_calendar", "Calendar"),
+		CANVAS("lv_canvas", "Canvas"),
+		CHART("lv_chart", "Chart"),
+		IMAGEBUTTON("lv_imgbtn", "Image Button"),
+		KEYBOARD("lv_keyboard", "Keyboard"),
+		LED("lv_led", "LED"),
+		LINE("lv_line", "Line"),
+		LIST("lv_list", "List"),
+		MENU("lv_menu", "Menu"),
+		MSGBOX("lv_msgbox", "Message Box"),
+		ROLLER("lv_roller", "Roller"),
+		SCALE("lv_scale", "Scale"),
+		SPANGROUP("lv_spangroup", "Spangroup"),
+		SPINBOX("lv_spinbox", "Spinbox"),
+		SPINNER("lv_spinner", "Spinner"),
+		TABLE("lv_table", "Table"),
+		TABVIEW("lv_tabview", "Tab View"),
+		TILEVIEW("lv_tileview", "Tile View"),
+		WIN("lv_win", "Window");
 
 		private final String lvglType;
 		private final String displayName;
