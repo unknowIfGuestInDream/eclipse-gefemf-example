@@ -41,8 +41,11 @@ public final class ConsoleLogger {
 	 * @param message the message to log
 	 */
 	public static void logInfo(String message) {
-		ILog log = Activator.getDefault().getLog();
-		log.log(new Status(IStatus.INFO, Activator.PLUGIN_ID, message));
+		Activator activator = Activator.getDefault();
+		if (activator != null) {
+			ILog log = activator.getLog();
+			log.log(new Status(IStatus.INFO, Activator.PLUGIN_ID, message));
+		}
 	}
 
 	/**
@@ -51,8 +54,11 @@ public final class ConsoleLogger {
 	 * @param message the message to log
 	 */
 	public static void logWarning(String message) {
-		ILog log = Activator.getDefault().getLog();
-		log.log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, message));
+		Activator activator = Activator.getDefault();
+		if (activator != null) {
+			ILog log = activator.getLog();
+			log.log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, message));
+		}
 	}
 
 	/**
@@ -61,8 +67,11 @@ public final class ConsoleLogger {
 	 * @param message the message to log
 	 */
 	public static void logError(String message) {
-		ILog log = Activator.getDefault().getLog();
-		log.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
+		Activator activator = Activator.getDefault();
+		if (activator != null) {
+			ILog log = activator.getLog();
+			log.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
+		}
 	}
 
 	/**
@@ -72,8 +81,11 @@ public final class ConsoleLogger {
 	 * @param e the exception to log
 	 */
 	public static void logError(String message, Throwable e) {
-		ILog log = Activator.getDefault().getLog();
-		log.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message, e));
+		Activator activator = Activator.getDefault();
+		if (activator != null) {
+			ILog log = activator.getLog();
+			log.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message, e));
+		}
 	}
 
 	/**
@@ -84,6 +96,9 @@ public final class ConsoleLogger {
 	 */
 	public static void writeToConsole(String message) {
 		MessageConsole console = findOrCreateConsole();
+		if (console == null) {
+			return;
+		}
 		try (MessageConsoleStream stream = console.newMessageStream()) {
 			stream.println(LOG_PREFIX + message);
 		} catch (IOException e) {
@@ -96,10 +111,13 @@ public final class ConsoleLogger {
 	 * Find an existing LVGL Code Generator console or create a new one.
 	 * Also activates and brings the console to front.
 	 * 
-	 * @return the MessageConsole instance
+	 * @return the MessageConsole instance, or null if ConsolePlugin is not available
 	 */
 	private static MessageConsole findOrCreateConsole() {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
+		if (plugin == null) {
+			return null;
+		}
 		IConsoleManager consoleManager = plugin.getConsoleManager();
 		IConsole[] existing = consoleManager.getConsoles();
 		
