@@ -18,10 +18,12 @@ import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.ui.views.properties.IPropertySource;
 
 import com.tlcsdm.eclipse.gefemf.demo.figure.LvglWidgetFigure;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 import com.tlcsdm.eclipse.gefemf.demo.model.ModelElement;
+import com.tlcsdm.eclipse.gefemf.demo.property.LvglWidgetPropertySource;
 
 /**
  * EditPart for LVGL widgets.
@@ -119,5 +121,14 @@ public class LvglWidgetEditPart extends AbstractGraphicalEditPart implements Pro
 			anchor = new ChopboxAnchor(getFigure());
 		}
 		return anchor;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
+		if (adapter == IPropertySource.class) {
+			return (T) new LvglWidgetPropertySource((LvglWidget) getModel());
+		}
+		return super.getAdapter(adapter);
 	}
 }

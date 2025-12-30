@@ -26,4 +26,5 @@ Export-Package: com.tlcsdm.eclipse.gefemf.demo.model,
  com.tlcsdm.eclipse.gefemf.demo.palette,
  com.tlcsdm.eclipse.gefemf.demo.generator,
  com.tlcsdm.eclipse.gefemf.demo.handler,
- com.tlcsdm.eclipse.gefemf.demo.wizard
+ com.tlcsdm.eclipse.gefemf.demo.wizard,
+ com.tlcsdm.eclipse.gefemf.demo.property
