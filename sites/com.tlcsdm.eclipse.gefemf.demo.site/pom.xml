@@ -11,10 +11,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>com.tlcsdm.eclipse.gefemf.demo.site</artifactId>
+    <artifactId>com.tlcsdm.eclipse.gefemf.demo.site.eclipse-repository</artifactId>
     <packaging>eclipse-repository</packaging>
 
-    <name>[updatesite] com.tlcsdm.eclipse.gefemf.demo.site</name>
+    <name>[updatesite] com.tlcsdm.eclipse.gefemf.demo.site.eclipse-repository</name>
 
     <profiles>
         <profile>
