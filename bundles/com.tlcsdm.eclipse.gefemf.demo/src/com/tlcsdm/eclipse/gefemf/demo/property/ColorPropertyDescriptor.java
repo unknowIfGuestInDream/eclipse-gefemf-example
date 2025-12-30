@@ -7,19 +7,17 @@
 package com.tlcsdm.eclipse.gefemf.demo.property;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColorCellEditor;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 /**
  * Property descriptor for color properties that provides a ColorDialog for editing.
- * This descriptor uses a ColorCellEditor to allow users to select colors through
- * the Eclipse color dialog.
+ * This descriptor uses a custom PositionedColorCellEditor to allow users to select colors
+ * through the Eclipse color dialog with a color swatch preview.
  * <p>
  * Note: The ColorDialog position is controlled by the operating system's window manager
- * and cannot be directly positioned programmatically in SWT. The dialog will appear
- * at the system-determined location (typically centered on screen or at the parent window).
+ * in SWT, so the dialog will appear at the system-determined location.
  * </p>
  */
 public class ColorPropertyDescriptor extends PropertyDescriptor {
@@ -36,7 +34,7 @@ public class ColorPropertyDescriptor extends PropertyDescriptor {
 
 	@Override
 	public CellEditor createPropertyEditor(Composite parent) {
-		ColorCellEditor editor = new ColorCellEditor(parent);
+		PositionedColorCellEditor editor = new PositionedColorCellEditor(parent);
 		if (getValidator() != null) {
 			editor.setValidator(getValidator());
 		}
