@@ -8,7 +8,6 @@ package com.tlcsdm.eclipse.gefemf.demo.editor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.EventObject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,6 +15,8 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.commands.CommandStackEvent;
+import org.eclipse.gef.commands.CommandStackEventListener;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.palette.PaletteViewer;
@@ -35,7 +36,7 @@ import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
 /**
  * GEF Editor for LVGL UI design.
  */
-public class DiagramEditor extends GraphicalEditorWithPalette {
+public class DiagramEditor extends GraphicalEditorWithPalette implements CommandStackEventListener {
 
 	public static final String ID = "com.tlcsdm.eclipse.gefemf.demo.editor";
 
@@ -117,9 +118,8 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		viewer.setContextMenu(contextMenuProvider);
 		
 		// Register as command stack listener to properly track dirty state
-		// Note: In GEF 3.x, addCommandStackListener is the recommended approach.
-		// The CommandStackListener interface has a single method, making it a functional interface.
-		getCommandStack().addCommandStackListener(this::commandStackChanged);
+		// Use CommandStackEventListener (the non-deprecated API) for command stack changes
+		getCommandStack().addCommandStackEventListener(this);
 	}
 
 	@Override
@@ -195,12 +195,24 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 	}
 
 	@Override
-	public void commandStackChanged(EventObject event) {
+	public void stackChanged(CommandStackEvent event) {
 		firePropertyChange(PROP_DIRTY);
 		super.updateActions(getStackActions());
 	}
 
 	public LvglScreen getScreen() {
 		return screen;
+	}
+
+	/**
+	 * Set the screen model and refresh the graphical viewer.
+	 * Used by the multi-page editor when XML content changes.
+	 */
+	public void setScreen(LvglScreen newScreen) {
+		this.screen = newScreen;
+		GraphicalViewer viewer = getGraphicalViewer();
+		if (viewer != null) {
+			viewer.setContents(screen);
+		}
 	}
 }

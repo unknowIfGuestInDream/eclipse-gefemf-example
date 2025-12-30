@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditor"
+            class="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramMultiPageEditor"
             contributorClass="com.tlcsdm.eclipse.gefemf.demo.editor.DiagramEditorActionBarContributor"
             default="true"
             extensions="gefxml"
