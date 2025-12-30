@@ -8,27 +8,16 @@ package com.tlcsdm.eclipse.gefemf.demo.wizard;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.ide.IDE;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
@@ -56,38 +45,10 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		String fileName = page.getFileName();
-		IResource container = page.getSelectedContainer();
-
-		if (container == null || !(container instanceof IFolder || container instanceof IProject)) {
-			return false;
-		}
-
 		try {
-			IFile file;
-			if (container instanceof IFolder) {
-				file = ((IFolder) container).getFile(fileName);
-			} else {
-				file = ((IProject) container).getFile(fileName);
-			}
-
-			// Create an empty LVGL screen
-			LvglScreen screen = new LvglScreen("main_screen");
-			screen.setWidth(480);
-			screen.setHeight(320);
-			screen.setBgColor(0xFFFFFF);
-
-			// Serialize the screen to XML
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			LvglXmlSerializer serializer = new LvglXmlSerializer();
-			serializer.save(screen, baos);
-
-			ByteArrayInputStream source = new ByteArrayInputStream(baos.toByteArray());
-
-			if (file.exists()) {
-				file.setContents(source, true, true, new NullProgressMonitor());
-			} else {
-				file.create(source, true, new NullProgressMonitor());
+			IFile file = page.createNewFile();
+			if (file == null) {
+				return false;
 			}
 
 			// Open the editor
@@ -102,91 +63,53 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * Wizard page for creating a new LVGL UI file.
+	 * Wizard page implementation extending WizardNewFileCreationPage for creating
+	 * new LVGL UI files with container browsing capability.
 	 */
-	private static class NewDiagramWizardPage extends WizardPage {
-
-		private IStructuredSelection selection;
-		private Text fileNameText;
-		private Text containerText;
-		private IResource container;
+	private static class NewDiagramWizardPage extends WizardNewFileCreationPage {
 
 		protected NewDiagramWizardPage(IStructuredSelection selection) {
-			super("newDiagramPage");
-			this.selection = selection;
+			super("newDiagramPage", selection);
 			setTitle("New LVGL UI File");
 			setDescription("Create a new LVGL UI design file (.gefxml).");
+			setFileExtension("gefxml");
+			setFileName("ui_screen.gefxml");
 		}
 
 		@Override
-		public void createControl(Composite parent) {
-			Composite composite = new Composite(parent, SWT.NONE);
-			composite.setLayout(new GridLayout(2, false));
+		protected InputStream getInitialContents() {
+			// Create an empty LVGL screen
+			LvglScreen screen = new LvglScreen("main_screen");
+			screen.setWidth(480);
+			screen.setHeight(320);
+			screen.setBgColor(0xFFFFFF);
 
-			// Container selection
-			Label containerLabel = new Label(composite, SWT.NONE);
-			containerLabel.setText("Container:");
-
-			containerText = new Text(composite, SWT.BORDER | SWT.READ_ONLY);
-			containerText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-			// Initialize container from selection
-			if (selection != null && !selection.isEmpty()) {
-				Object selected = selection.getFirstElement();
-				if (selected instanceof IResource) {
-					container = (IResource) selected;
-					if (container instanceof IFile) {
-						container = container.getParent();
-					}
-					containerText.setText(container.getFullPath().toString());
-				}
+			// Serialize the screen to XML
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			LvglXmlSerializer serializer = new LvglXmlSerializer();
+			try {
+				serializer.save(screen, baos);
+				return new ByteArrayInputStream(baos.toByteArray());
+			} catch (Exception e) {
+				// Return empty content if serialization fails
+				e.printStackTrace();
+				return new ByteArrayInputStream(new byte[0]);
 			}
-
-			// File name
-			Label fileLabel = new Label(composite, SWT.NONE);
-			fileLabel.setText("File name:");
-
-			fileNameText = new Text(composite, SWT.BORDER);
-			fileNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			fileNameText.setText("ui_screen.gefxml");
-			fileNameText.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(ModifyEvent e) {
-					validatePage();
-				}
-			});
-
-			setControl(composite);
-			validatePage();
 		}
 
-		private void validatePage() {
-			String fileName = fileNameText.getText();
-			if (fileName == null || fileName.isEmpty()) {
-				setErrorMessage("File name is required.");
-				setPageComplete(false);
-				return;
+		@Override
+		protected boolean validatePage() {
+			if (!super.validatePage()) {
+				return false;
 			}
-			if (!fileName.endsWith(".gefxml")) {
+
+			String fileName = getFileName();
+			if (fileName != null && !fileName.endsWith(".gefxml")) {
 				setErrorMessage("File name must end with .gefxml extension.");
-				setPageComplete(false);
-				return;
+				return false;
 			}
-			if (container == null) {
-				setErrorMessage("Please select a container (project or folder).");
-				setPageComplete(false);
-				return;
-			}
-			setErrorMessage(null);
-			setPageComplete(true);
-		}
 
-		public String getFileName() {
-			return fileNameText.getText();
-		}
-
-		public IResource getSelectedContainer() {
-			return container;
+			return true;
 		}
 	}
 }
