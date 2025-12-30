@@ -9,7 +9,6 @@ package com.tlcsdm.eclipse.gefemf.demo.palette;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 
@@ -44,11 +43,6 @@ public class LvglWidgetIcons {
 		}
 
 		// Create a simple 16x16 (or scaled) icon with different colors/patterns
-		RGB[] rgbs = new RGB[256];
-		for (int i = 0; i < 256; i++) {
-			rgbs[i] = new RGB(i, i, i);
-		}
-		
 		PaletteData palette = new PaletteData(0xFF0000, 0x00FF00, 0x0000FF);
 		ImageData data = new ImageData(size, size, 24, palette);
 		
@@ -234,10 +228,18 @@ public class LvglWidgetIcons {
 			data.setPixel(i, 3, fg);
 			data.setPixel(i, s - 4, fg);
 		}
-		// Checkmark
+		// Checkmark - bounds-checked to ensure pixels stay within image
 		for (int i = 0; i < 3; i++) {
-			data.setPixel(5 + i, s/2 + i, fg);
-			data.setPixel(8 + i, s/2 - i, fg);
+			int x1 = 5 + i;
+			int y1 = s/2 + i;
+			int x2 = 8 + i;
+			int y2 = s/2 - i;
+			if (x1 >= 0 && x1 < s && y1 >= 0 && y1 < s) {
+				data.setPixel(x1, y1, fg);
+			}
+			if (x2 >= 0 && x2 < s && y2 >= 0 && y2 < s) {
+				data.setPixel(x2, y2, fg);
+			}
 		}
 	}
 

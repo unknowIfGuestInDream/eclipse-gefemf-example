@@ -39,9 +39,7 @@ public class MultiLineStringFieldEditor extends StringFieldEditor {
 
 	@Override
 	public Text getTextControl(Composite parent) {
-		Text text = super.getTextControl(parent);
-		// We need to replace the single-line text with multi-line
-		return text;
+		return super.getTextControl(parent);
 	}
 
 	@Override
