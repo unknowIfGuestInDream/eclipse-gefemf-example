@@ -21,10 +21,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.tlcsdm.eclipse.gefemf.demo.generator.LvglCodeGenerator;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglXmlSerializer;
+import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
 
 /**
  * Handler for generating C code from a selected gefxml file in the context menu.
- * Outputs log messages to the console instead of showing dialogs.
+ * Outputs log messages to the Eclipse platform log and console.
  */
 public class GenerateCodeFromFileHandler extends AbstractHandler {
 
@@ -33,7 +34,8 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 
 		if (!(selection instanceof IStructuredSelection)) {
-			logToConsole("Warning: Please select a .gefxml file.");
+			ConsoleLogger.logWarning("Please select a .gefxml file.");
+			ConsoleLogger.writeToConsole("Warning: Please select a .gefxml file.");
 			return null;
 		}
 
@@ -41,13 +43,15 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 		Object firstElement = structuredSelection.getFirstElement();
 
 		if (!(firstElement instanceof IFile)) {
-			logToConsole("Warning: Please select a .gefxml file.");
+			ConsoleLogger.logWarning("Please select a .gefxml file.");
+			ConsoleLogger.writeToConsole("Warning: Please select a .gefxml file.");
 			return null;
 		}
 
 		IFile diagramFile = (IFile) firstElement;
 		if (!diagramFile.getName().endsWith(".gefxml")) {
-			logToConsole("Warning: Please select a .gefxml file.");
+			ConsoleLogger.logWarning("Please select a .gefxml file.");
+			ConsoleLogger.writeToConsole("Warning: Please select a .gefxml file.");
 			return null;
 		}
 
@@ -57,7 +61,8 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 			LvglScreen screen = serializer.load(diagramFile.getContents());
 
 			if (screen == null || screen.getWidgets().isEmpty()) {
-				logToConsole("Warning: The screen is empty. Please add some widgets first.");
+				ConsoleLogger.logWarning("The screen is empty. Please add some widgets first.");
+				ConsoleLogger.writeToConsole("Warning: The screen is empty. Please add some widgets first.");
 				return null;
 			}
 
@@ -92,19 +97,16 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 				sourceFile.create(cSource, true, new NullProgressMonitor());
 			}
 
-			logToConsole("Successfully generated LVGL C code:");
-			logToConsole("  " + headerFile.getFullPath().toString());
-			logToConsole("  " + sourceFile.getFullPath().toString());
+			ConsoleLogger.logInfo("Successfully generated LVGL C code: " + headerFile.getFullPath() + ", " + sourceFile.getFullPath());
+			ConsoleLogger.writeToConsole("Successfully generated LVGL C code:");
+			ConsoleLogger.writeToConsole("  " + headerFile.getFullPath().toString());
+			ConsoleLogger.writeToConsole("  " + sourceFile.getFullPath().toString());
 
 		} catch (Exception e) {
-			logToConsole("Error: Failed to generate code: " + e.getMessage());
-			e.printStackTrace();
+			ConsoleLogger.logError("Failed to generate code: " + e.getMessage(), e);
+			ConsoleLogger.writeToConsole("Error: Failed to generate code: " + e.getMessage());
 		}
 
 		return null;
-	}
-
-	private void logToConsole(String message) {
-		System.out.println("[LVGL Code Generator] " + message);
 	}
 }

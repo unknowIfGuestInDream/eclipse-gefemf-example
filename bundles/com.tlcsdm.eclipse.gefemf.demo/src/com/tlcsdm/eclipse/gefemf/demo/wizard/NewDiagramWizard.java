@@ -22,6 +22,7 @@ import org.eclipse.ui.ide.IDE;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglXmlSerializer;
+import com.tlcsdm.eclipse.gefemf.demo.util.ConsoleLogger;
 
 /**
  * Wizard for creating a new LVGL UI file.
@@ -57,7 +58,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			ConsoleLogger.logError("Failed to create new diagram file", e);
 			return false;
 		}
 	}
@@ -92,7 +93,7 @@ public class NewDiagramWizard extends Wizard implements INewWizard {
 				return new ByteArrayInputStream(baos.toByteArray());
 			} catch (Exception e) {
 				// Return empty content if serialization fails
-				e.printStackTrace();
+				ConsoleLogger.logError("Failed to serialize initial screen content", e);
 				return new ByteArrayInputStream(new byte[0]);
 			}
 		}
