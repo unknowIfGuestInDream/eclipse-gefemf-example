@@ -238,6 +238,56 @@ public class LvglCodeGenerator {
 			}
 		}
 
+		// Set checked state for checkbox/switch
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CHECKBOX && widget.isChecked()) {
+			sb.append(indent).append("lv_obj_add_state(").append(varName).append(", LV_STATE_CHECKED);\n");
+		}
+		if (widget.getWidgetType() == LvglWidget.WidgetType.SWITCH && widget.isChecked()) {
+			sb.append(indent).append("lv_obj_add_state(").append(varName).append(", LV_STATE_CHECKED);\n");
+		}
+
+		// Set value for slider/arc/bar
+		if (widget.getWidgetType() == LvglWidget.WidgetType.SLIDER) {
+			sb.append(indent).append("lv_slider_set_range(").append(varName).append(", ");
+			sb.append(widget.getMinValue()).append(", ").append(widget.getMaxValue()).append(");\n");
+			sb.append(indent).append("lv_slider_set_value(").append(varName).append(", ");
+			sb.append(widget.getValue()).append(", LV_ANIM_OFF);\n");
+		}
+		if (widget.getWidgetType() == LvglWidget.WidgetType.ARC) {
+			sb.append(indent).append("lv_arc_set_range(").append(varName).append(", ");
+			sb.append(widget.getMinValue()).append(", ").append(widget.getMaxValue()).append(");\n");
+			sb.append(indent).append("lv_arc_set_value(").append(varName).append(", ");
+			sb.append(widget.getValue()).append(");\n");
+		}
+		if (widget.getWidgetType() == LvglWidget.WidgetType.BAR) {
+			sb.append(indent).append("lv_bar_set_range(").append(varName).append(", ");
+			sb.append(widget.getMinValue()).append(", ").append(widget.getMaxValue()).append(");\n");
+			sb.append(indent).append("lv_bar_set_value(").append(varName).append(", ");
+			sb.append(widget.getValue()).append(", LV_ANIM_OFF);\n");
+		}
+
+		// Set table properties
+		if (widget.getWidgetType() == LvglWidget.WidgetType.TABLE) {
+			sb.append(indent).append("lv_table_set_row_cnt(").append(varName).append(", ");
+			sb.append(widget.getRowCount()).append(");\n");
+			sb.append(indent).append("lv_table_set_col_cnt(").append(varName).append(", ");
+			sb.append(widget.getColumnCount()).append(");\n");
+			
+			// Parse and set table data if available
+			String tableData = widget.getTableData();
+			if (tableData != null && !tableData.isEmpty()) {
+				String[] rows = tableData.split(";");
+				for (int row = 0; row < rows.length && row < widget.getRowCount(); row++) {
+					String[] cols = rows[row].split(",");
+					for (int col = 0; col < cols.length && col < widget.getColumnCount(); col++) {
+						String cellText = cols[col].trim();
+						sb.append(indent).append("lv_table_set_cell_value(").append(varName).append(", ");
+						sb.append(row).append(", ").append(col).append(", \"").append(escapeString(cellText)).append("\");\n");
+					}
+				}
+			}
+		}
+
 		// Set background color
 		if (widget.getBgColor() != 0xFFFFFF) {
 			sb.append(indent).append("lv_obj_set_style_bg_color(").append(varName);

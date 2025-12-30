@@ -74,6 +74,13 @@ public class LvglWidgetEditPart extends AbstractGraphicalEditPart implements Pro
 		figure.setWidgetName(widget.getName());
 		figure.setWidgetText(widget.getText());
 		figure.setWidgetBgColor(widget.getBgColor());
+		// Update new widget-specific visual properties
+		figure.setChecked(widget.isChecked());
+		figure.setValue(widget.getValue());
+		figure.setMinValue(widget.getMinValue());
+		figure.setMaxValue(widget.getMaxValue());
+		figure.setRowCount(widget.getRowCount());
+		figure.setColumnCount(widget.getColumnCount());
 
 		Rectangle bounds = widget.getBounds();
 		((GraphicalEditPart) getParent()).setLayoutConstraint(this, figure, bounds);
@@ -83,7 +90,9 @@ public class LvglWidgetEditPart extends AbstractGraphicalEditPart implements Pro
 	public void propertyChange(PropertyChangeEvent evt) {
 		String prop = evt.getPropertyName();
 		if (ModelElement.PROPERTY_LAYOUT.equals(prop) || ModelElement.PROPERTY_NAME.equals(prop)
-				|| "widgetType".equals(prop) || "text".equals(prop) || "bgColor".equals(prop)) {
+				|| "widgetType".equals(prop) || "text".equals(prop) || "bgColor".equals(prop)
+				|| "checked".equals(prop) || "value".equals(prop) || "minValue".equals(prop)
+				|| "maxValue".equals(prop) || "rowCount".equals(prop) || "columnCount".equals(prop)) {
 			refreshVisuals();
 		} else if (ModelElement.PROPERTY_CONNECTION.equals(prop)) {
 			refreshSourceConnections();

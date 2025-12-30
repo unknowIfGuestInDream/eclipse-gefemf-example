@@ -33,6 +33,13 @@ public class LvglWidgetFigure extends Figure {
 	private String text = "";
 	private int bgColor = 0xFFFFFF;
 	private Color bgColorInstance;
+	// New widget-specific visual properties
+	private boolean checked = false;
+	private int value = 0;
+	private int minValue = 0;
+	private int maxValue = 100;
+	private int rowCount = 3;
+	private int columnCount = 3;
 
 	public LvglWidgetFigure() {
 		setLayoutManager(new XYLayout());
@@ -68,6 +75,36 @@ public class LvglWidgetFigure extends Figure {
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;
 		bgColorInstance = new Color(Display.getCurrent(), r, g, b);
+		repaint();
+	}
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+		repaint();
+	}
+
+	public void setValue(int value) {
+		this.value = value;
+		repaint();
+	}
+
+	public void setMinValue(int minValue) {
+		this.minValue = minValue;
+		repaint();
+	}
+
+	public void setMaxValue(int maxValue) {
+		this.maxValue = maxValue;
+		repaint();
+	}
+
+	public void setRowCount(int rowCount) {
+		this.rowCount = rowCount;
+		repaint();
+	}
+
+	public void setColumnCount(int columnCount) {
+		this.columnCount = columnCount;
 		repaint();
 	}
 
@@ -152,6 +189,9 @@ public class LvglWidgetFigure extends Figure {
 		case CONTAINER:
 			drawContainer(g, r);
 			break;
+		case TABLE:
+			drawTable(g, r);
+			break;
 		default:
 			drawDefault(g, r);
 			break;
@@ -188,12 +228,22 @@ public class LvglWidgetFigure extends Figure {
 		int trackY = r.y + r.height / 2;
 		int trackHeight = 6;
 
-		// Draw track
+		// Draw track background
 		g.setBackgroundColor(ColorConstants.lightGray);
 		g.fillRectangle(r.x + 5, trackY - trackHeight / 2, r.width - 10, trackHeight);
 
-		// Draw knob
-		int knobX = r.x + r.width / 2;
+		// Calculate knob position based on value
+		int trackWidth = r.width - 10;
+		int range = maxValue - minValue;
+		int normalizedValue = range > 0 ? (value - minValue) * trackWidth / range : 0;
+		normalizedValue = Math.max(0, Math.min(normalizedValue, trackWidth));
+		
+		// Draw filled portion
+		g.setBackgroundColor(ColorConstants.blue);
+		g.fillRectangle(r.x + 5, trackY - trackHeight / 2, normalizedValue, trackHeight);
+
+		// Draw knob at value position
+		int knobX = r.x + 5 + normalizedValue;
 		g.setBackgroundColor(ColorConstants.blue);
 		g.fillOval(knobX - 8, trackY - 8, 16, 16);
 	}
@@ -204,33 +254,41 @@ public class LvglWidgetFigure extends Figure {
 		int switchHeight = Math.min(20, r.height - 4);
 		int switchX = r.x + (r.width - switchWidth) / 2;
 
-		// Draw track
-		g.setBackgroundColor(ColorConstants.green);
+		// Draw track - green when checked, gray when unchecked
+		g.setBackgroundColor(checked ? ColorConstants.green : ColorConstants.lightGray);
 		g.fillRoundRectangle(new Rectangle(switchX, centerY - switchHeight / 2, switchWidth, switchHeight), switchHeight, switchHeight);
 
-		// Draw knob
+		// Draw knob - position based on checked state
 		g.setBackgroundColor(ColorConstants.white);
-		g.fillOval(switchX + switchWidth - switchHeight + 2, centerY - switchHeight / 2 + 2, switchHeight - 4, switchHeight - 4);
+		if (checked) {
+			g.fillOval(switchX + switchWidth - switchHeight + 2, centerY - switchHeight / 2 + 2, switchHeight - 4, switchHeight - 4);
+		} else {
+			g.fillOval(switchX + 2, centerY - switchHeight / 2 + 2, switchHeight - 4, switchHeight - 4);
+		}
 	}
 
 	private void drawCheckbox(Graphics g, Rectangle r) {
 		int boxSize = Math.min(16, Math.min(r.width - 10, r.height - 4));
 		int boxY = r.y + (r.height - boxSize) / 2;
 
-		// Draw checkbox
-		g.setBackgroundColor(ColorConstants.white);
+		// Draw checkbox background - blue when checked, white when unchecked
+		g.setBackgroundColor(checked ? ColorConstants.blue : ColorConstants.white);
 		g.fillRectangle(r.x + 5, boxY, boxSize, boxSize);
 		g.setForegroundColor(ColorConstants.black);
 		g.drawRectangle(r.x + 5, boxY, boxSize, boxSize);
 
-		// Draw checkmark
-		g.setLineStyle(SWT.LINE_SOLID);
-		g.setLineWidth(2);
-		g.drawLine(r.x + 8, boxY + boxSize / 2, r.x + 5 + boxSize / 2, boxY + boxSize - 4);
-		g.drawLine(r.x + 5 + boxSize / 2, boxY + boxSize - 4, r.x + 5 + boxSize - 2, boxY + 4);
-		g.setLineWidth(1);
+		// Draw checkmark only if checked
+		if (checked) {
+			g.setForegroundColor(ColorConstants.white);
+			g.setLineStyle(SWT.LINE_SOLID);
+			g.setLineWidth(2);
+			g.drawLine(r.x + 8, boxY + boxSize / 2, r.x + 5 + boxSize / 2, boxY + boxSize - 4);
+			g.drawLine(r.x + 5 + boxSize / 2, boxY + boxSize - 4, r.x + 5 + boxSize - 2, boxY + 4);
+			g.setLineWidth(1);
+		}
 
 		// Draw text
+		g.setForegroundColor(ColorConstants.black);
 		if (!text.isEmpty()) {
 			g.drawString(text, r.x + boxSize + 10, boxY);
 		}
@@ -269,14 +327,19 @@ public class LvglWidgetFigure extends Figure {
 		int centerY = r.y + r.height / 2;
 		int radius = Math.min(r.width, r.height) / 2 - 8;
 
-		// Draw arc background
+		// Draw arc background (270 degree arc)
 		g.setForegroundColor(ColorConstants.lightGray);
 		g.setLineWidth(8);
 		g.drawArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 135, 270);
 
-		// Draw arc value
+		// Calculate arc value angle based on value
+		int range = maxValue - minValue;
+		int normalizedValue = range > 0 ? (value - minValue) * 270 / range : 0;
+		normalizedValue = Math.max(0, Math.min(normalizedValue, 270));
+
+		// Draw arc value portion
 		g.setForegroundColor(ColorConstants.blue);
-		g.drawArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 135, 180);
+		g.drawArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 135, normalizedValue);
 		g.setLineWidth(1);
 	}
 
@@ -288,9 +351,15 @@ public class LvglWidgetFigure extends Figure {
 		g.setBackgroundColor(ColorConstants.lightGray);
 		g.fillRectangle(r.x + 5, barY, r.width - 10, barHeight);
 
+		// Calculate progress width based on value
+		int range = maxValue - minValue;
+		int barWidth = r.width - 10;
+		int progressWidth = range > 0 ? (value - minValue) * barWidth / range : 0;
+		progressWidth = Math.max(0, Math.min(progressWidth, barWidth));
+
 		// Draw progress
 		g.setBackgroundColor(ColorConstants.blue);
-		g.fillRectangle(r.x + 5, barY, (r.width - 10) * 60 / 100, barHeight);
+		g.fillRectangle(r.x + 5, barY, progressWidth, barHeight);
 	}
 
 	private void drawImage(Graphics g, Rectangle r) {
@@ -316,6 +385,34 @@ public class LvglWidgetFigure extends Figure {
 		g.setLineStyle(SWT.LINE_DASH);
 		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
 		g.setLineStyle(SWT.LINE_SOLID);
+	}
+
+	private void drawTable(Graphics g, Rectangle r) {
+		// Draw table background
+		g.setBackgroundColor(ColorConstants.white);
+		g.fillRectangle(r.x + 3, r.y + 3, r.width - 6, r.height - 6);
+		g.setForegroundColor(ColorConstants.black);
+		g.drawRectangle(r.x + 3, r.y + 3, r.width - 7, r.height - 7);
+
+		// Draw grid lines based on row and column count
+		int tableWidth = r.width - 6;
+		int tableHeight = r.height - 6;
+		int colWidth = columnCount > 0 ? tableWidth / columnCount : tableWidth;
+		int rowHeight = rowCount > 0 ? tableHeight / rowCount : tableHeight;
+
+		g.setForegroundColor(ColorConstants.lightGray);
+
+		// Draw vertical lines
+		for (int i = 1; i < columnCount; i++) {
+			int x = r.x + 3 + i * colWidth;
+			g.drawLine(x, r.y + 3, x, r.y + r.height - 4);
+		}
+
+		// Draw horizontal lines
+		for (int i = 1; i < rowCount; i++) {
+			int y = r.y + 3 + i * rowHeight;
+			g.drawLine(r.x + 3, y, r.x + r.width - 4, y);
+		}
 	}
 
 	private void drawDefault(Graphics g, Rectangle r) {

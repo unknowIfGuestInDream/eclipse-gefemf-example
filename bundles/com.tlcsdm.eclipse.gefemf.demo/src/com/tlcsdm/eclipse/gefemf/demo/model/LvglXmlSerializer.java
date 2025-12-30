@@ -106,6 +106,30 @@ public class LvglXmlSerializer {
 			element.setAttribute("imageSource", widget.getImageSource());
 		}
 
+		// Checkbox/Switch checked state
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CHECKBOX 
+				|| widget.getWidgetType() == LvglWidget.WidgetType.SWITCH) {
+			element.setAttribute("checked", String.valueOf(widget.isChecked()));
+		}
+
+		// Value properties (for Slider, Arc, Bar)
+		if (widget.getWidgetType() == LvglWidget.WidgetType.SLIDER 
+				|| widget.getWidgetType() == LvglWidget.WidgetType.ARC 
+				|| widget.getWidgetType() == LvglWidget.WidgetType.BAR) {
+			element.setAttribute("value", String.valueOf(widget.getValue()));
+			element.setAttribute("minValue", String.valueOf(widget.getMinValue()));
+			element.setAttribute("maxValue", String.valueOf(widget.getMaxValue()));
+		}
+
+		// Table properties
+		if (widget.getWidgetType() == LvglWidget.WidgetType.TABLE) {
+			element.setAttribute("rowCount", String.valueOf(widget.getRowCount()));
+			element.setAttribute("columnCount", String.valueOf(widget.getColumnCount()));
+			if (widget.getTableData() != null && !widget.getTableData().isEmpty()) {
+				element.setAttribute("tableData", widget.getTableData());
+			}
+		}
+
 		// Layout properties (for containers)
 		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
 			element.setAttribute("layoutType", widget.getLayoutType().name());
@@ -159,6 +183,25 @@ public class LvglXmlSerializer {
 		String imageSource = element.getAttribute("imageSource");
 		if (imageSource != null && !imageSource.isEmpty()) {
 			widget.setImageSource(imageSource);
+		}
+
+		// Checkbox/Switch checked state
+		String checkedStr = element.getAttribute("checked");
+		if (checkedStr != null && !checkedStr.isEmpty()) {
+			widget.setChecked(Boolean.parseBoolean(checkedStr));
+		}
+
+		// Value properties (for Slider, Arc, Bar)
+		widget.setValue(parseInt(element.getAttribute("value"), 0));
+		widget.setMinValue(parseInt(element.getAttribute("minValue"), 0));
+		widget.setMaxValue(parseInt(element.getAttribute("maxValue"), 100));
+
+		// Table properties
+		widget.setRowCount(parseInt(element.getAttribute("rowCount"), 3));
+		widget.setColumnCount(parseInt(element.getAttribute("columnCount"), 3));
+		String tableData = element.getAttribute("tableData");
+		if (tableData != null && !tableData.isEmpty()) {
+			widget.setTableData(tableData);
 		}
 
 		// Layout properties
