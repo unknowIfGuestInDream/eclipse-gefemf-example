@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -158,6 +157,8 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 
 	/**
 	 * Saves the multi-page editor's document.
+	 * When saving from Design tab, the graphical model is serialized to XML and saved.
+	 * When saving from Source tab, the XML is saved and the graphical model is updated.
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
@@ -167,12 +168,16 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 			textEditor.doSave(monitor);
 			// Refresh UI editor with new content
 			refreshGraphicalEditor();
+			// Reset the xmlModified flag since we've synchronized
+			xmlModified = false;
 		} else {
-			// Save from graphical editor
+			// Save from graphical editor - serialize and save
 			graphicalEditor.doSave(monitor);
-			// Update the text editor content
-			refreshTextEditor();
+			// Update the text editor content and sync its dirty state
+			refreshTextEditorAndSave(monitor);
 		}
+		// Fire property change to update the dirty state indicator
+		firePropertyChange(PROP_DIRTY);
 	}
 
 	/**
@@ -211,6 +216,16 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
+	}
+
+	/**
+	 * Returns whether the editor is dirty.
+	 * The multi-page editor is dirty if either the graphical editor or text editor has unsaved changes.
+	 */
+	@Override
+	public boolean isDirty() {
+		return (graphicalEditor != null && graphicalEditor.isDirty()) 
+			|| (textEditor != null && textEditor.isDirty());
 	}
 
 	/**
@@ -276,6 +291,43 @@ public class DiagramMultiPageEditor extends MultiPageEditorPart implements IReso
 			}
 		} catch (Exception e) {
 			ConsoleLogger.logError("Failed to refresh XML editor from UI", e);
+		}
+	}
+
+	/**
+	 * Refresh the text editor with content from the graphical model and save it.
+	 * This ensures the text editor is synchronized and not marked dirty after save.
+	 */
+	private void refreshTextEditorAndSave(IProgressMonitor monitor) {
+		try {
+			LvglScreen screen = graphicalEditor.getScreen();
+			if (screen != null) {
+				LvglXmlSerializer serializer = new LvglXmlSerializer();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				serializer.save(screen, baos);
+				
+				IDocument document = textEditor.getDocumentProvider().getDocument(getEditorInput());
+				if (document != null) {
+					// Temporarily remove listener to avoid triggering xmlModified
+					if (documentListener != null) {
+						document.removeDocumentListener(documentListener);
+					}
+					document.set(baos.toString(StandardCharsets.UTF_8));
+					if (documentListener != null) {
+						document.addDocumentListener(documentListener);
+					}
+					// Save the text editor to clear its dirty state
+					// This writes the content directly to the file (already done by graphicalEditor.doSave)
+					// We just need to reset the document provider's dirty state
+					textEditor.getDocumentProvider().resetDocument(getEditorInput());
+					// Re-set the document content since resetDocument reloads from file
+					document = textEditor.getDocumentProvider().getDocument(getEditorInput());
+					// Reset xmlModified since content is now synchronized
+					xmlModified = false;
+				}
+			}
+		} catch (Exception e) {
+			ConsoleLogger.logError("Failed to refresh and save XML editor from UI", e);
 		}
 	}
 
