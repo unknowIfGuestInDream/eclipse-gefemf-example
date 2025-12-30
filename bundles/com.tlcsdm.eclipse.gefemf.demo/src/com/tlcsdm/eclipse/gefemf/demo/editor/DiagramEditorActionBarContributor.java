@@ -12,7 +12,6 @@ import org.eclipse.gef.ui.actions.RedoRetargetAction;
 import org.eclipse.gef.ui.actions.UndoRetargetAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 
 /**
@@ -41,11 +40,5 @@ public class DiagramEditorActionBarContributor extends ActionBarContributor {
 		toolBarManager.add(getAction(ActionFactory.REDO.getId()));
 		toolBarManager.add(new Separator());
 		toolBarManager.add(getAction(ActionFactory.DELETE.getId()));
-		toolBarManager.add(new Separator());
-		
-		// Add Generate Code action
-		IWorkbenchWindow window = getPage().getWorkbenchWindow();
-		GenerateCodeAction generateAction = new GenerateCodeAction(window);
-		toolBarManager.add(generateAction);
 	}
 }
