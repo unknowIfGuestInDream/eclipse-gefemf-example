@@ -26,9 +26,7 @@ public class LvglContainerFigure extends Figure {
 
 	private final Label nameLabel;
 	private final Label typeLabel;
-	private LvglWidget.WidgetType widgetType = LvglWidget.WidgetType.CONTAINER;
 	private String text = "";
-	private int bgColor = 0xFFFFFF;
 	private Color bgColorInstance;
 
 	public LvglContainerFigure() {
@@ -46,7 +44,6 @@ public class LvglContainerFigure extends Figure {
 	}
 
 	public void setWidgetType(LvglWidget.WidgetType type) {
-		this.widgetType = type;
 		typeLabel.setText("[" + type.getDisplayName() + "]");
 		repaint();
 	}
@@ -61,7 +58,6 @@ public class LvglContainerFigure extends Figure {
 	}
 
 	public void setWidgetBgColor(int color) {
-		this.bgColor = color;
 		// Dispose old color if we created one
 		if (bgColorInstance != null && !bgColorInstance.isDisposed()) {
 			bgColorInstance.dispose();

@@ -209,7 +209,7 @@ public class LvglWidgetFigure extends Figure {
 		// Draw text centered
 		if (!text.isEmpty()) {
 			g.setForegroundColor(ColorConstants.black);
-			int textWidth = g.getFontMetrics().getAverageCharWidth() * text.length();
+			int textWidth = (int) (g.getFontMetrics().getAverageCharacterWidth() * text.length());
 			int textX = r.x + (r.width - textWidth) / 2;
 			int textY = r.y + (r.height - g.getFontMetrics().getHeight()) / 2;
 			g.drawString(text, textX, textY);
