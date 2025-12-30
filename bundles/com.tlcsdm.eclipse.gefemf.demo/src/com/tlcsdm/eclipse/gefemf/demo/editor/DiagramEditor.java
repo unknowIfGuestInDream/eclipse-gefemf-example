@@ -13,6 +13,7 @@ import java.util.EventObject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.commands.CommandStackListener;
@@ -102,6 +103,11 @@ public class DiagramEditor extends GraphicalEditorWithPalette {
 		GraphicalViewer viewer = getGraphicalViewer();
 		viewer.setEditPartFactory(new LvglEditPartFactory());
 		viewer.setRootEditPart(new ScalableFreeformRootEditPart());
+		
+		// Add context menu for right-click delete and other actions
+		ContextMenuProvider contextMenuProvider = new DiagramContextMenuProvider(viewer, getActionRegistry());
+		viewer.setContextMenu(contextMenuProvider);
+		getSite().registerContextMenu(contextMenuProvider, viewer);
 		
 		// Register as command stack listener to properly track dirty state
 		getCommandStack().addCommandStackListener(new CommandStackListener() {

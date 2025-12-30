@@ -49,6 +49,87 @@ public class LvglWidget extends ModelElement {
 		}
 	}
 
+	/**
+	 * Layout types supported by LVGL containers.
+	 */
+	public enum LayoutType {
+		NONE("None", "LV_LAYOUT_NONE"),
+		FLEX("Flex", "LV_LAYOUT_FLEX"),
+		GRID("Grid", "LV_LAYOUT_GRID");
+
+		private final String displayName;
+		private final String lvglConstant;
+
+		LayoutType(String displayName, String lvglConstant) {
+			this.displayName = displayName;
+			this.lvglConstant = lvglConstant;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
+
+		public String getLvglConstant() {
+			return lvglConstant;
+		}
+	}
+
+	/**
+	 * Flex flow direction for flex layout.
+	 */
+	public enum FlexFlow {
+		ROW("Row", "LV_FLEX_FLOW_ROW"),
+		COLUMN("Column", "LV_FLEX_FLOW_COLUMN"),
+		ROW_WRAP("Row Wrap", "LV_FLEX_FLOW_ROW_WRAP"),
+		COLUMN_WRAP("Column Wrap", "LV_FLEX_FLOW_COLUMN_WRAP"),
+		ROW_REVERSE("Row Reverse", "LV_FLEX_FLOW_ROW_REVERSE"),
+		COLUMN_REVERSE("Column Reverse", "LV_FLEX_FLOW_COLUMN_REVERSE");
+
+		private final String displayName;
+		private final String lvglConstant;
+
+		FlexFlow(String displayName, String lvglConstant) {
+			this.displayName = displayName;
+			this.lvglConstant = lvglConstant;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
+
+		public String getLvglConstant() {
+			return lvglConstant;
+		}
+	}
+
+	/**
+	 * Flex alignment options.
+	 */
+	public enum FlexAlign {
+		START("Start", "LV_FLEX_ALIGN_START"),
+		END("End", "LV_FLEX_ALIGN_END"),
+		CENTER("Center", "LV_FLEX_ALIGN_CENTER"),
+		SPACE_EVENLY("Space Evenly", "LV_FLEX_ALIGN_SPACE_EVENLY"),
+		SPACE_AROUND("Space Around", "LV_FLEX_ALIGN_SPACE_AROUND"),
+		SPACE_BETWEEN("Space Between", "LV_FLEX_ALIGN_SPACE_BETWEEN");
+
+		private final String displayName;
+		private final String lvglConstant;
+
+		FlexAlign(String displayName, String lvglConstant) {
+			this.displayName = displayName;
+			this.lvglConstant = lvglConstant;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
+
+		public String getLvglConstant() {
+			return lvglConstant;
+		}
+	}
+
 	private String name = "widget";
 	private WidgetType widgetType = WidgetType.BUTTON;
 	private Rectangle bounds = new Rectangle(0, 0, 100, 40);
@@ -64,6 +145,18 @@ public class LvglWidget extends ModelElement {
 	private int borderWidth = 0;
 	private int borderColor = 0x000000;
 	private int radius = 0;
+
+	// Image-specific properties
+	private String imageSource = "";
+
+	// Layout properties (for containers)
+	private LayoutType layoutType = LayoutType.NONE;
+	private FlexFlow flexFlow = FlexFlow.ROW;
+	private FlexAlign flexMainAlign = FlexAlign.START;
+	private FlexAlign flexCrossAlign = FlexAlign.START;
+	private FlexAlign flexTrackAlign = FlexAlign.START;
+	private int padRow = 0;
+	private int padColumn = 0;
 
 	public LvglWidget() {
 		// Default constructor
@@ -186,6 +279,88 @@ public class LvglWidget extends ModelElement {
 		int oldValue = this.radius;
 		this.radius = radius;
 		firePropertyChange("radius", oldValue, radius);
+	}
+
+	public String getImageSource() {
+		return imageSource;
+	}
+
+	public void setImageSource(String imageSource) {
+		String oldValue = this.imageSource;
+		this.imageSource = imageSource != null ? imageSource : "";
+		firePropertyChange("imageSource", oldValue, this.imageSource);
+	}
+
+	// Layout properties getters and setters
+
+	public LayoutType getLayoutType() {
+		return layoutType;
+	}
+
+	public void setLayoutType(LayoutType layoutType) {
+		LayoutType oldValue = this.layoutType;
+		this.layoutType = layoutType != null ? layoutType : LayoutType.NONE;
+		firePropertyChange("layoutType", oldValue, this.layoutType);
+	}
+
+	public FlexFlow getFlexFlow() {
+		return flexFlow;
+	}
+
+	public void setFlexFlow(FlexFlow flexFlow) {
+		FlexFlow oldValue = this.flexFlow;
+		this.flexFlow = flexFlow != null ? flexFlow : FlexFlow.ROW;
+		firePropertyChange("flexFlow", oldValue, this.flexFlow);
+	}
+
+	public FlexAlign getFlexMainAlign() {
+		return flexMainAlign;
+	}
+
+	public void setFlexMainAlign(FlexAlign flexMainAlign) {
+		FlexAlign oldValue = this.flexMainAlign;
+		this.flexMainAlign = flexMainAlign != null ? flexMainAlign : FlexAlign.START;
+		firePropertyChange("flexMainAlign", oldValue, this.flexMainAlign);
+	}
+
+	public FlexAlign getFlexCrossAlign() {
+		return flexCrossAlign;
+	}
+
+	public void setFlexCrossAlign(FlexAlign flexCrossAlign) {
+		FlexAlign oldValue = this.flexCrossAlign;
+		this.flexCrossAlign = flexCrossAlign != null ? flexCrossAlign : FlexAlign.START;
+		firePropertyChange("flexCrossAlign", oldValue, this.flexCrossAlign);
+	}
+
+	public FlexAlign getFlexTrackAlign() {
+		return flexTrackAlign;
+	}
+
+	public void setFlexTrackAlign(FlexAlign flexTrackAlign) {
+		FlexAlign oldValue = this.flexTrackAlign;
+		this.flexTrackAlign = flexTrackAlign != null ? flexTrackAlign : FlexAlign.START;
+		firePropertyChange("flexTrackAlign", oldValue, this.flexTrackAlign);
+	}
+
+	public int getPadRow() {
+		return padRow;
+	}
+
+	public void setPadRow(int padRow) {
+		int oldValue = this.padRow;
+		this.padRow = padRow;
+		firePropertyChange("padRow", oldValue, padRow);
+	}
+
+	public int getPadColumn() {
+		return padColumn;
+	}
+
+	public void setPadColumn(int padColumn) {
+		int oldValue = this.padColumn;
+		this.padColumn = padColumn;
+		firePropertyChange("padColumn", oldValue, padColumn);
 	}
 
 	public List<Connection> getSourceConnections() {

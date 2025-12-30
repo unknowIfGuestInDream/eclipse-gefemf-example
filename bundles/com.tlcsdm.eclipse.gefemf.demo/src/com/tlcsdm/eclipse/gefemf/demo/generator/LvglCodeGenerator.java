@@ -15,9 +15,22 @@ import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 public class LvglCodeGenerator {
 
 	private final LvglScreen screen;
+	private final String baseName;
 
 	public LvglCodeGenerator(LvglScreen screen) {
+		this(screen, null);
+	}
+
+	public LvglCodeGenerator(LvglScreen screen, String baseName) {
 		this.screen = screen;
+		this.baseName = baseName;
+	}
+
+	/**
+	 * Get the name to use for file generation (file base name if provided, otherwise screen name).
+	 */
+	private String getGenerationName() {
+		return (baseName != null && !baseName.isEmpty()) ? baseName : screen.getName();
 	}
 
 	/**
@@ -25,10 +38,11 @@ public class LvglCodeGenerator {
 	 */
 	public String generateHeader() {
 		StringBuilder sb = new StringBuilder();
-		String guardName = screen.getName().toUpperCase() + "_H";
+		String generationName = getGenerationName();
+		String guardName = generationName.toUpperCase() + "_H";
 
 		sb.append("/**\n");
-		sb.append(" * @file ").append(screen.getName()).append(".h\n");
+		sb.append(" * @file ").append(generationName).append(".h\n");
 		sb.append(" * @brief LVGL UI screen header - auto-generated\n");
 		sb.append(" */\n\n");
 
@@ -42,7 +56,7 @@ public class LvglCodeGenerator {
 		sb.append("#endif\n\n");
 
 		// Declare screen object
-		sb.append("extern lv_obj_t *").append(screen.getName()).append(";\n\n");
+		sb.append("extern lv_obj_t *").append(generationName).append(";\n\n");
 
 		// Declare widget objects
 		for (LvglWidget widget : screen.getWidgets()) {
@@ -52,8 +66,8 @@ public class LvglCodeGenerator {
 		sb.append("\n");
 
 		// Function declarations
-		sb.append("void ").append(screen.getName()).append("_create(void);\n");
-		sb.append("void ").append(screen.getName()).append("_delete(void);\n");
+		sb.append("void ").append(generationName).append("_create(void);\n");
+		sb.append("void ").append(generationName).append("_delete(void);\n");
 
 		sb.append("\n#ifdef __cplusplus\n");
 		sb.append("}\n");
@@ -69,16 +83,17 @@ public class LvglCodeGenerator {
 	 */
 	public String generateSource() {
 		StringBuilder sb = new StringBuilder();
+		String generationName = getGenerationName();
 
 		sb.append("/**\n");
-		sb.append(" * @file ").append(screen.getName()).append(".c\n");
+		sb.append(" * @file ").append(generationName).append(".c\n");
 		sb.append(" * @brief LVGL UI screen implementation - auto-generated\n");
 		sb.append(" */\n\n");
 
-		sb.append("#include \"").append(screen.getName()).append(".h\"\n\n");
+		sb.append("#include \"").append(generationName).append(".h\"\n\n");
 
 		// Define screen object
-		sb.append("lv_obj_t *").append(screen.getName()).append(" = NULL;\n\n");
+		sb.append("lv_obj_t *").append(generationName).append(" = NULL;\n\n");
 
 		// Define widget objects
 		for (LvglWidget widget : screen.getWidgets()) {
@@ -88,26 +103,26 @@ public class LvglCodeGenerator {
 		sb.append("\n");
 
 		// Create function
-		sb.append("void ").append(screen.getName()).append("_create(void) {\n");
-		sb.append("    ").append(screen.getName()).append(" = lv_obj_create(NULL);\n");
-		sb.append("    lv_obj_set_size(").append(screen.getName()).append(", ");
+		sb.append("void ").append(generationName).append("_create(void) {\n");
+		sb.append("    ").append(generationName).append(" = lv_obj_create(NULL);\n");
+		sb.append("    lv_obj_set_size(").append(generationName).append(", ");
 		sb.append(screen.getWidth()).append(", ").append(screen.getHeight()).append(");\n");
-		sb.append("    lv_obj_set_style_bg_color(").append(screen.getName());
+		sb.append("    lv_obj_set_style_bg_color(").append(generationName);
 		sb.append(", lv_color_hex(0x").append(String.format("%06X", screen.getBgColor()));
 		sb.append("), LV_PART_MAIN);\n\n");
 
 		// Create widgets
 		for (LvglWidget widget : screen.getWidgets()) {
-			generateWidgetCreation(sb, widget, screen.getName(), "    ");
+			generateWidgetCreation(sb, widget, generationName, "    ");
 		}
 
 		sb.append("}\n\n");
 
 		// Delete function
-		sb.append("void ").append(screen.getName()).append("_delete(void) {\n");
-		sb.append("    if (").append(screen.getName()).append(" != NULL) {\n");
-		sb.append("        lv_obj_del(").append(screen.getName()).append(");\n");
-		sb.append("        ").append(screen.getName()).append(" = NULL;\n");
+		sb.append("void ").append(generationName).append("_delete(void) {\n");
+		sb.append("    if (").append(generationName).append(" != NULL) {\n");
+		sb.append("        lv_obj_del(").append(generationName).append(");\n");
+		sb.append("        ").append(generationName).append(" = NULL;\n");
 		sb.append("    }\n");
 		sb.append("}\n");
 
@@ -176,6 +191,15 @@ public class LvglCodeGenerator {
 			}
 		}
 
+		// Set image source if applicable
+		if (widget.getWidgetType() == LvglWidget.WidgetType.IMAGE) {
+			String imageSource = widget.getImageSource();
+			if (imageSource != null && !imageSource.isEmpty()) {
+				sb.append(indent).append("lv_img_set_src(").append(varName);
+				sb.append(", ").append(imageSource).append(");\n");
+			}
+		}
+
 		// Set background color
 		if (widget.getBgColor() != 0xFFFFFF) {
 			sb.append(indent).append("lv_obj_set_style_bg_color(").append(varName);
@@ -206,11 +230,46 @@ public class LvglCodeGenerator {
 			sb.append(", ").append(widget.getRadius()).append(", LV_PART_MAIN);\n");
 		}
 
+		// Set layout for containers
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER && widget.getLayoutType() != LvglWidget.LayoutType.NONE) {
+			generateLayoutCode(sb, widget, varName, indent);
+		}
+
 		sb.append("\n");
 
 		// Create child widgets
 		for (LvglWidget child : widget.getChildren()) {
 			generateWidgetCreation(sb, child, varName, indent);
+		}
+	}
+
+	private void generateLayoutCode(StringBuilder sb, LvglWidget widget, String varName, String indent) {
+		LvglWidget.LayoutType layoutType = widget.getLayoutType();
+
+		if (layoutType == LvglWidget.LayoutType.FLEX) {
+			// Set flex layout
+			sb.append(indent).append("lv_obj_set_layout(").append(varName).append(", LV_LAYOUT_FLEX);\n");
+			
+			// Set flex flow
+			sb.append(indent).append("lv_obj_set_flex_flow(").append(varName).append(", ");
+			sb.append(widget.getFlexFlow().getLvglConstant()).append(");\n");
+			
+			// Set flex alignment
+			sb.append(indent).append("lv_obj_set_flex_align(").append(varName).append(", ");
+			sb.append(widget.getFlexMainAlign().getLvglConstant()).append(", ");
+			sb.append(widget.getFlexCrossAlign().getLvglConstant()).append(", ");
+			sb.append(widget.getFlexTrackAlign().getLvglConstant()).append(");\n");
+		} else if (layoutType == LvglWidget.LayoutType.GRID) {
+			// Set grid layout
+			sb.append(indent).append("lv_obj_set_layout(").append(varName).append(", LV_LAYOUT_GRID);\n");
+		}
+
+		// Set padding for layout
+		if (widget.getPadRow() > 0 || widget.getPadColumn() > 0) {
+			sb.append(indent).append("lv_obj_set_style_pad_row(").append(varName);
+			sb.append(", ").append(widget.getPadRow()).append(", LV_PART_MAIN);\n");
+			sb.append(indent).append("lv_obj_set_style_pad_column(").append(varName);
+			sb.append(", ").append(widget.getPadColumn()).append(", LV_PART_MAIN);\n");
 		}
 	}
 

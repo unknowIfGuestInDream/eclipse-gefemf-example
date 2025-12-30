@@ -11,9 +11,9 @@ import java.io.ByteArrayInputStream;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -48,24 +48,25 @@ public class GenerateCodeHandler extends AbstractHandler {
 			return null;
 		}
 
-		// Generate code
-		LvglCodeGenerator generator = new LvglCodeGenerator(screen);
-		String headerCode = generator.generateHeader();
-		String sourceCode = generator.generateSource();
-
-		// Save generated files
+		// Save generated files in the same folder as the gefxml file with the same base name
 		try {
 			IFile diagramFile = (IFile) diagramEditor.getEditorInput().getAdapter(IFile.class);
 			if (diagramFile != null) {
-				IProject project = diagramFile.getProject();
-				IFolder srcGenFolder = project.getFolder("src-gen");
-
-				if (!srcGenFolder.exists()) {
-					srcGenFolder.create(true, true, new NullProgressMonitor());
+				// Get the parent folder and base name of the gefxml file
+				IContainer parentFolder = diagramFile.getParent();
+				String baseName = diagramFile.getName();
+				// Remove the .gefxml extension to get the base name
+				if (baseName.endsWith(".gefxml")) {
+					baseName = baseName.substring(0, baseName.length() - 7);
 				}
 
-				// Generate header file
-				IFile headerFile = srcGenFolder.getFile(screen.getName() + ".h");
+				// Generate code using the file base name
+				LvglCodeGenerator generator = new LvglCodeGenerator(screen, baseName);
+				String headerCode = generator.generateHeader();
+				String sourceCode = generator.generateSource();
+
+				// Generate header file with same name as gefxml
+				IFile headerFile = parentFolder.getFile(new org.eclipse.core.runtime.Path(baseName + ".h"));
 				ByteArrayInputStream headerSource = new ByteArrayInputStream(headerCode.getBytes("UTF-8"));
 				if (headerFile.exists()) {
 					headerFile.setContents(headerSource, true, true, new NullProgressMonitor());
@@ -73,8 +74,8 @@ public class GenerateCodeHandler extends AbstractHandler {
 					headerFile.create(headerSource, true, new NullProgressMonitor());
 				}
 
-				// Generate source file
-				IFile sourceFile = srcGenFolder.getFile(screen.getName() + ".c");
+				// Generate source file with same name as gefxml
+				IFile sourceFile = parentFolder.getFile(new org.eclipse.core.runtime.Path(baseName + ".c"));
 				ByteArrayInputStream cSource = new ByteArrayInputStream(sourceCode.getBytes("UTF-8"));
 				if (sourceFile.exists()) {
 					sourceFile.setContents(cSource, true, true, new NullProgressMonitor());
@@ -83,9 +84,8 @@ public class GenerateCodeHandler extends AbstractHandler {
 				}
 
 				MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "Code Generated",
-						"Successfully generated LVGL C code:\n" + srcGenFolder.getFullPath().toString() + "/"
-								+ screen.getName() + ".h\n" + srcGenFolder.getFullPath().toString() + "/"
-								+ screen.getName() + ".c");
+						"Successfully generated LVGL C code:\n" + headerFile.getFullPath().toString() + "\n"
+								+ sourceFile.getFullPath().toString());
 			}
 		} catch (Exception e) {
 			MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error",
