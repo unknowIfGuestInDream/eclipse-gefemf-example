@@ -172,6 +172,19 @@ public class LvglWidget extends ModelElement {
 	// Image-specific properties
 	private String imageSource = "";
 
+	// Checkbox/Switch state
+	private boolean checked = false;
+
+	// Value-based properties (for Slider, Arc, Bar)
+	private int value = 0;
+	private int minValue = 0;
+	private int maxValue = 100;
+
+	// Table properties
+	private int rowCount = 3;
+	private int columnCount = 3;
+	private String tableData = "";
+
 	// Layout properties (for containers)
 	private LayoutType layoutType = LayoutType.NONE;
 	private FlexFlow flexFlow = FlexFlow.ROW;
@@ -312,6 +325,82 @@ public class LvglWidget extends ModelElement {
 		String oldValue = this.imageSource;
 		this.imageSource = imageSource != null ? imageSource : "";
 		firePropertyChange("imageSource", oldValue, this.imageSource);
+	}
+
+	// Checkbox/Switch checked state
+
+	public boolean isChecked() {
+		return checked;
+	}
+
+	public void setChecked(boolean checked) {
+		boolean oldValue = this.checked;
+		this.checked = checked;
+		firePropertyChange("checked", oldValue, checked);
+	}
+
+	// Value-based properties (for Slider, Arc, Bar)
+
+	public int getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		int oldValue = this.value;
+		this.value = value;
+		firePropertyChange("value", oldValue, value);
+	}
+
+	public int getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(int minValue) {
+		int oldValue = this.minValue;
+		this.minValue = minValue;
+		firePropertyChange("minValue", oldValue, minValue);
+	}
+
+	public int getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(int maxValue) {
+		int oldValue = this.maxValue;
+		this.maxValue = maxValue;
+		firePropertyChange("maxValue", oldValue, maxValue);
+	}
+
+	// Table properties
+
+	public int getRowCount() {
+		return rowCount;
+	}
+
+	public void setRowCount(int rowCount) {
+		int oldValue = this.rowCount;
+		this.rowCount = rowCount;
+		firePropertyChange("rowCount", oldValue, rowCount);
+	}
+
+	public int getColumnCount() {
+		return columnCount;
+	}
+
+	public void setColumnCount(int columnCount) {
+		int oldValue = this.columnCount;
+		this.columnCount = columnCount;
+		firePropertyChange("columnCount", oldValue, columnCount);
+	}
+
+	public String getTableData() {
+		return tableData;
+	}
+
+	public void setTableData(String tableData) {
+		String oldValue = this.tableData;
+		this.tableData = tableData != null ? tableData : "";
+		firePropertyChange("tableData", oldValue, this.tableData);
 	}
 
 	// Layout properties getters and setters

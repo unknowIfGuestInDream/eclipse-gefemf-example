@@ -43,6 +43,14 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	private static final String PROPERTY_FLEX_TRACK_ALIGN = "flexTrackAlign";
 	private static final String PROPERTY_PAD_ROW = "padRow";
 	private static final String PROPERTY_PAD_COLUMN = "padColumn";
+	// New widget-specific properties
+	private static final String PROPERTY_CHECKED = "checked";
+	private static final String PROPERTY_VALUE = "value";
+	private static final String PROPERTY_MIN_VALUE = "minValue";
+	private static final String PROPERTY_MAX_VALUE = "maxValue";
+	private static final String PROPERTY_ROW_COUNT = "rowCount";
+	private static final String PROPERTY_COLUMN_COUNT = "columnCount";
+	private static final String PROPERTY_TABLE_DATA = "tableData";
 
 	private static final String CATEGORY_GENERAL = "General";
 	private static final String CATEGORY_POSITION = "Position";
@@ -50,6 +58,9 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	private static final String CATEGORY_STYLE = "Style";
 	private static final String CATEGORY_IMAGE = "Image";
 	private static final String CATEGORY_LAYOUT = "Layout";
+	private static final String CATEGORY_STATE = "State";
+	private static final String CATEGORY_VALUE = "Value";
+	private static final String CATEGORY_TABLE = "Table";
 
 	// Cached enum values arrays for dropdown properties
 	private static final LvglWidget.LayoutType[] LAYOUT_TYPES = LvglWidget.LayoutType.values();
@@ -156,6 +167,53 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			descriptors.add(imageSourceDescriptor);
 		}
 
+		// Checkbox/Switch state properties
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CHECKBOX 
+				|| widget.getWidgetType() == LvglWidget.WidgetType.SWITCH) {
+			ComboBoxPropertyDescriptor checkedDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_CHECKED, "Checked", new String[] { "false", "true" });
+			checkedDescriptor.setCategory(CATEGORY_STATE);
+			checkedDescriptor.setDescription("Whether the widget is in checked/on state");
+			descriptors.add(checkedDescriptor);
+		}
+
+		// Value properties (for Slider, Arc, Bar)
+		if (widget.getWidgetType() == LvglWidget.WidgetType.SLIDER 
+				|| widget.getWidgetType() == LvglWidget.WidgetType.ARC 
+				|| widget.getWidgetType() == LvglWidget.WidgetType.BAR) {
+			TextPropertyDescriptor valueDescriptor = new TextPropertyDescriptor(PROPERTY_VALUE, "Value");
+			valueDescriptor.setCategory(CATEGORY_VALUE);
+			valueDescriptor.setDescription("Current value of the widget");
+			descriptors.add(valueDescriptor);
+
+			TextPropertyDescriptor minValueDescriptor = new TextPropertyDescriptor(PROPERTY_MIN_VALUE, "Min Value");
+			minValueDescriptor.setCategory(CATEGORY_VALUE);
+			minValueDescriptor.setDescription("Minimum value");
+			descriptors.add(minValueDescriptor);
+
+			TextPropertyDescriptor maxValueDescriptor = new TextPropertyDescriptor(PROPERTY_MAX_VALUE, "Max Value");
+			maxValueDescriptor.setCategory(CATEGORY_VALUE);
+			maxValueDescriptor.setDescription("Maximum value");
+			descriptors.add(maxValueDescriptor);
+		}
+
+		// Table properties
+		if (widget.getWidgetType() == LvglWidget.WidgetType.TABLE) {
+			TextPropertyDescriptor rowCountDescriptor = new TextPropertyDescriptor(PROPERTY_ROW_COUNT, "Row Count");
+			rowCountDescriptor.setCategory(CATEGORY_TABLE);
+			rowCountDescriptor.setDescription("Number of rows in the table");
+			descriptors.add(rowCountDescriptor);
+
+			TextPropertyDescriptor columnCountDescriptor = new TextPropertyDescriptor(PROPERTY_COLUMN_COUNT, "Column Count");
+			columnCountDescriptor.setCategory(CATEGORY_TABLE);
+			columnCountDescriptor.setDescription("Number of columns in the table");
+			descriptors.add(columnCountDescriptor);
+
+			TextPropertyDescriptor tableDataDescriptor = new TextPropertyDescriptor(PROPERTY_TABLE_DATA, "Table Data");
+			tableDataDescriptor.setCategory(CATEGORY_TABLE);
+			tableDataDescriptor.setDescription("Table cell data in format: row1col1,row1col2;row2col1,row2col2 (semicolon separates rows, comma separates columns)");
+			descriptors.add(tableDataDescriptor);
+		}
+
 		// Layout properties (only show for Container widgets)
 		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
 			// Layout Type dropdown
@@ -231,6 +289,20 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			return String.valueOf(widget.getRadius());
 		case PROPERTY_IMAGE_SOURCE:
 			return widget.getImageSource();
+		case PROPERTY_CHECKED:
+			return Integer.valueOf(widget.isChecked() ? 1 : 0);
+		case PROPERTY_VALUE:
+			return String.valueOf(widget.getValue());
+		case PROPERTY_MIN_VALUE:
+			return String.valueOf(widget.getMinValue());
+		case PROPERTY_MAX_VALUE:
+			return String.valueOf(widget.getMaxValue());
+		case PROPERTY_ROW_COUNT:
+			return String.valueOf(widget.getRowCount());
+		case PROPERTY_COLUMN_COUNT:
+			return String.valueOf(widget.getColumnCount());
+		case PROPERTY_TABLE_DATA:
+			return widget.getTableData();
 		case PROPERTY_LAYOUT_TYPE:
 			return Integer.valueOf(widget.getLayoutType().ordinal());
 		case PROPERTY_FLEX_FLOW:
@@ -282,6 +354,27 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			break;
 		case PROPERTY_IMAGE_SOURCE:
 			widget.setImageSource("");
+			break;
+		case PROPERTY_CHECKED:
+			widget.setChecked(false);
+			break;
+		case PROPERTY_VALUE:
+			widget.setValue(0);
+			break;
+		case PROPERTY_MIN_VALUE:
+			widget.setMinValue(0);
+			break;
+		case PROPERTY_MAX_VALUE:
+			widget.setMaxValue(100);
+			break;
+		case PROPERTY_ROW_COUNT:
+			widget.setRowCount(3);
+			break;
+		case PROPERTY_COLUMN_COUNT:
+			widget.setColumnCount(3);
+			break;
+		case PROPERTY_TABLE_DATA:
+			widget.setTableData("");
 			break;
 		case PROPERTY_LAYOUT_TYPE:
 			widget.setLayoutType(LvglWidget.LayoutType.NONE);
@@ -347,6 +440,28 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			break;
 		case PROPERTY_IMAGE_SOURCE:
 			widget.setImageSource((String) value);
+			break;
+		case PROPERTY_CHECKED:
+			int checkedIndex = ((Integer) value).intValue();
+			widget.setChecked(checkedIndex == 1);
+			break;
+		case PROPERTY_VALUE:
+			widget.setValue(PropertyUtils.parseInt((String) value, 0));
+			break;
+		case PROPERTY_MIN_VALUE:
+			widget.setMinValue(PropertyUtils.parseInt((String) value, 0));
+			break;
+		case PROPERTY_MAX_VALUE:
+			widget.setMaxValue(PropertyUtils.parseInt((String) value, 100));
+			break;
+		case PROPERTY_ROW_COUNT:
+			widget.setRowCount(PropertyUtils.parseInt((String) value, 3));
+			break;
+		case PROPERTY_COLUMN_COUNT:
+			widget.setColumnCount(PropertyUtils.parseInt((String) value, 3));
+			break;
+		case PROPERTY_TABLE_DATA:
+			widget.setTableData((String) value);
 			break;
 		case PROPERTY_LAYOUT_TYPE:
 			int layoutIndex = ((Integer) value).intValue();
