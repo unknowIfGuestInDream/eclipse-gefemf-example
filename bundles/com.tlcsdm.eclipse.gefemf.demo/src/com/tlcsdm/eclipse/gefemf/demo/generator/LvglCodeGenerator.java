@@ -305,6 +305,51 @@ public class LvglCodeGenerator {
 			return "lv_arc_create";
 		case BAR:
 			return "lv_bar_create";
+		// New widget types
+		case ANIMIMG:
+			return "lv_animimg_create";
+		case ARCLABEL:
+			return "lv_arclabel_create";
+		case BUTTONMATRIX:
+			return "lv_btnmatrix_create";
+		case CALENDAR:
+			return "lv_calendar_create";
+		case CANVAS:
+			return "lv_canvas_create";
+		case CHART:
+			return "lv_chart_create";
+		case IMAGEBUTTON:
+			return "lv_imgbtn_create";
+		case KEYBOARD:
+			return "lv_keyboard_create";
+		case LED:
+			return "lv_led_create";
+		case LINE:
+			return "lv_line_create";
+		case LIST:
+			return "lv_list_create";
+		case MENU:
+			return "lv_menu_create";
+		case MSGBOX:
+			return "lv_msgbox_create";
+		case ROLLER:
+			return "lv_roller_create";
+		case SCALE:
+			return "lv_scale_create";
+		case SPANGROUP:
+			return "lv_spangroup_create";
+		case SPINBOX:
+			return "lv_spinbox_create";
+		case SPINNER:
+			return "lv_spinner_create";
+		case TABLE:
+			return "lv_table_create";
+		case TABVIEW:
+			return "lv_tabview_create";
+		case TILEVIEW:
+			return "lv_tileview_create";
+		case WIN:
+			return "lv_win_create";
 		case CONTAINER:
 		default:
 			return "lv_obj_create";

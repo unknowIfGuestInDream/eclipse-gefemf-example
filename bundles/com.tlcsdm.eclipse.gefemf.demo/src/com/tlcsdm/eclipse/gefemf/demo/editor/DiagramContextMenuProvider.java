@@ -17,9 +17,13 @@ import org.eclipse.ui.actions.ActionFactory;
 
 /**
  * Context menu provider for the diagram editor.
- * Provides right-click menu actions for widgets including delete.
+ * Provides right-click menu actions for widgets including Undo, Redo, Delete
+ * and Generate LVGL Code.
  */
 public class DiagramContextMenuProvider extends ContextMenuProvider {
+
+	/** Action ID for generate LVGL code command. */
+	public static final String GENERATE_LVGL_CODE_ACTION_ID = "generateLvglCode";
 
 	private final ActionRegistry actionRegistry;
 
@@ -51,7 +55,11 @@ public class DiagramContextMenuProvider extends ContextMenuProvider {
 			menu.appendToGroup(GEFActionConstants.GROUP_EDIT, deleteAction);
 		}
 
-		// Add separator and custom actions group
+		// Add separator and Generate LVGL Code action
 		menu.add(new Separator("custom"));
+		IAction generateAction = actionRegistry.getAction(GENERATE_LVGL_CODE_ACTION_ID);
+		if (generateAction != null) {
+			menu.add(generateAction);
+		}
 	}
 }

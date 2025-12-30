@@ -9,6 +9,7 @@ package com.tlcsdm.eclipse.gefemf.demo.property;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
@@ -49,6 +50,33 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	private static final String CATEGORY_STYLE = "Style";
 	private static final String CATEGORY_IMAGE = "Image";
 	private static final String CATEGORY_LAYOUT = "Layout";
+
+	// Cached enum values arrays for dropdown properties
+	private static final LvglWidget.LayoutType[] LAYOUT_TYPES = LvglWidget.LayoutType.values();
+	private static final LvglWidget.FlexFlow[] FLEX_FLOWS = LvglWidget.FlexFlow.values();
+	private static final LvglWidget.FlexAlign[] FLEX_ALIGNS = LvglWidget.FlexAlign.values();
+
+	// Cached label arrays for dropdown properties
+	private static final String[] LAYOUT_TYPE_LABELS;
+	private static final String[] FLEX_FLOW_LABELS;
+	private static final String[] FLEX_ALIGN_LABELS;
+
+	static {
+		LAYOUT_TYPE_LABELS = new String[LAYOUT_TYPES.length];
+		for (int i = 0; i < LAYOUT_TYPES.length; i++) {
+			LAYOUT_TYPE_LABELS[i] = LAYOUT_TYPES[i].getDisplayName();
+		}
+
+		FLEX_FLOW_LABELS = new String[FLEX_FLOWS.length];
+		for (int i = 0; i < FLEX_FLOWS.length; i++) {
+			FLEX_FLOW_LABELS[i] = FLEX_FLOWS[i].getDisplayName();
+		}
+
+		FLEX_ALIGN_LABELS = new String[FLEX_ALIGNS.length];
+		for (int i = 0; i < FLEX_ALIGNS.length; i++) {
+			FLEX_ALIGN_LABELS[i] = FLEX_ALIGNS[i].getDisplayName();
+		}
+	}
 
 	private final LvglWidget widget;
 
@@ -130,29 +158,34 @@ public class LvglWidgetPropertySource implements IPropertySource {
 
 		// Layout properties (only show for Container widgets)
 		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
-			TextPropertyDescriptor layoutTypeDescriptor = new TextPropertyDescriptor(PROPERTY_LAYOUT_TYPE, "Layout Type");
+			// Layout Type dropdown
+			ComboBoxPropertyDescriptor layoutTypeDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_LAYOUT_TYPE, "Layout Type", LAYOUT_TYPE_LABELS);
 			layoutTypeDescriptor.setCategory(CATEGORY_LAYOUT);
-			layoutTypeDescriptor.setDescription("Layout type: NONE, FLEX, or GRID");
+			layoutTypeDescriptor.setDescription("Layout type for the container");
 			descriptors.add(layoutTypeDescriptor);
 
-			TextPropertyDescriptor flexFlowDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_FLOW, "Flex Flow");
+			// Flex Flow dropdown
+			ComboBoxPropertyDescriptor flexFlowDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_FLOW, "Flex Flow", FLEX_FLOW_LABELS);
 			flexFlowDescriptor.setCategory(CATEGORY_LAYOUT);
-			flexFlowDescriptor.setDescription("Flex flow direction: ROW, COLUMN, ROW_WRAP, COLUMN_WRAP, ROW_REVERSE, COLUMN_REVERSE");
+			flexFlowDescriptor.setDescription("Flex flow direction");
 			descriptors.add(flexFlowDescriptor);
 
-			TextPropertyDescriptor flexMainAlignDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_MAIN_ALIGN, "Flex Main Align");
+			// Flex Main Align dropdown
+			ComboBoxPropertyDescriptor flexMainAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_MAIN_ALIGN, "Flex Main Align", FLEX_ALIGN_LABELS);
 			flexMainAlignDescriptor.setCategory(CATEGORY_LAYOUT);
-			flexMainAlignDescriptor.setDescription("Main axis alignment: START, END, CENTER, SPACE_EVENLY, SPACE_AROUND, SPACE_BETWEEN");
+			flexMainAlignDescriptor.setDescription("Main axis alignment");
 			descriptors.add(flexMainAlignDescriptor);
 
-			TextPropertyDescriptor flexCrossAlignDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_CROSS_ALIGN, "Flex Cross Align");
+			// Flex Cross Align dropdown
+			ComboBoxPropertyDescriptor flexCrossAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_CROSS_ALIGN, "Flex Cross Align", FLEX_ALIGN_LABELS);
 			flexCrossAlignDescriptor.setCategory(CATEGORY_LAYOUT);
-			flexCrossAlignDescriptor.setDescription("Cross axis alignment: START, END, CENTER, SPACE_EVENLY, SPACE_AROUND, SPACE_BETWEEN");
+			flexCrossAlignDescriptor.setDescription("Cross axis alignment");
 			descriptors.add(flexCrossAlignDescriptor);
 
-			TextPropertyDescriptor flexTrackAlignDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_TRACK_ALIGN, "Flex Track Align");
+			// Flex Track Align dropdown
+			ComboBoxPropertyDescriptor flexTrackAlignDescriptor = new ComboBoxPropertyDescriptor(PROPERTY_FLEX_TRACK_ALIGN, "Flex Track Align", FLEX_ALIGN_LABELS);
 			flexTrackAlignDescriptor.setCategory(CATEGORY_LAYOUT);
-			flexTrackAlignDescriptor.setDescription("Track alignment for wrapped content: START, END, CENTER, SPACE_EVENLY, SPACE_AROUND, SPACE_BETWEEN");
+			flexTrackAlignDescriptor.setDescription("Track alignment for wrapped content");
 			descriptors.add(flexTrackAlignDescriptor);
 
 			TextPropertyDescriptor padRowDescriptor = new TextPropertyDescriptor(PROPERTY_PAD_ROW, "Padding Row");
@@ -199,15 +232,15 @@ public class LvglWidgetPropertySource implements IPropertySource {
 		case PROPERTY_IMAGE_SOURCE:
 			return widget.getImageSource();
 		case PROPERTY_LAYOUT_TYPE:
-			return widget.getLayoutType().name();
+			return Integer.valueOf(widget.getLayoutType().ordinal());
 		case PROPERTY_FLEX_FLOW:
-			return widget.getFlexFlow().name();
+			return Integer.valueOf(widget.getFlexFlow().ordinal());
 		case PROPERTY_FLEX_MAIN_ALIGN:
-			return widget.getFlexMainAlign().name();
+			return Integer.valueOf(widget.getFlexMainAlign().ordinal());
 		case PROPERTY_FLEX_CROSS_ALIGN:
-			return widget.getFlexCrossAlign().name();
+			return Integer.valueOf(widget.getFlexCrossAlign().ordinal());
 		case PROPERTY_FLEX_TRACK_ALIGN:
-			return widget.getFlexTrackAlign().name();
+			return Integer.valueOf(widget.getFlexTrackAlign().ordinal());
 		case PROPERTY_PAD_ROW:
 			return String.valueOf(widget.getPadRow());
 		case PROPERTY_PAD_COLUMN:
@@ -278,84 +311,78 @@ public class LvglWidgetPropertySource implements IPropertySource {
 
 	@Override
 	public void setPropertyValue(Object id, Object value) {
-		String strValue = (String) value;
 		switch ((String) id) {
 		case PROPERTY_NAME:
-			widget.setName(strValue);
+			widget.setName((String) value);
 			break;
 		case PROPERTY_TEXT:
-			widget.setText(strValue);
+			widget.setText((String) value);
 			break;
 		case PROPERTY_X:
-			setX(strValue);
+			setX((String) value);
 			break;
 		case PROPERTY_Y:
-			setY(strValue);
+			setY((String) value);
 			break;
 		case PROPERTY_WIDTH:
-			setWidth(strValue);
+			setWidth((String) value);
 			break;
 		case PROPERTY_HEIGHT:
-			setHeight(strValue);
+			setHeight((String) value);
 			break;
 		case PROPERTY_BG_COLOR:
-			widget.setBgColor(PropertyUtils.parseColor(strValue));
+			widget.setBgColor(PropertyUtils.parseColor((String) value));
 			break;
 		case PROPERTY_TEXT_COLOR:
-			widget.setTextColor(PropertyUtils.parseColor(strValue));
+			widget.setTextColor(PropertyUtils.parseColor((String) value));
 			break;
 		case PROPERTY_BORDER_WIDTH:
-			widget.setBorderWidth(PropertyUtils.parseInt(strValue, 0));
+			widget.setBorderWidth(PropertyUtils.parseInt((String) value, 0));
 			break;
 		case PROPERTY_BORDER_COLOR:
-			widget.setBorderColor(PropertyUtils.parseColor(strValue));
+			widget.setBorderColor(PropertyUtils.parseColor((String) value));
 			break;
 		case PROPERTY_RADIUS:
-			widget.setRadius(PropertyUtils.parseInt(strValue, 0));
+			widget.setRadius(PropertyUtils.parseInt((String) value, 0));
 			break;
 		case PROPERTY_IMAGE_SOURCE:
-			widget.setImageSource(strValue);
+			widget.setImageSource((String) value);
 			break;
 		case PROPERTY_LAYOUT_TYPE:
-			try {
-				widget.setLayoutType(LvglWidget.LayoutType.valueOf(strValue.toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				widget.setLayoutType(LvglWidget.LayoutType.NONE);
+			int layoutIndex = ((Integer) value).intValue();
+			if (layoutIndex >= 0 && layoutIndex < LAYOUT_TYPES.length) {
+				widget.setLayoutType(LAYOUT_TYPES[layoutIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_FLOW:
-			try {
-				widget.setFlexFlow(LvglWidget.FlexFlow.valueOf(strValue.toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				widget.setFlexFlow(LvglWidget.FlexFlow.ROW);
+			int flowIndex = ((Integer) value).intValue();
+			if (flowIndex >= 0 && flowIndex < FLEX_FLOWS.length) {
+				widget.setFlexFlow(FLEX_FLOWS[flowIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_MAIN_ALIGN:
-			try {
-				widget.setFlexMainAlign(LvglWidget.FlexAlign.valueOf(strValue.toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				widget.setFlexMainAlign(LvglWidget.FlexAlign.START);
+			int mainAlignIndex = ((Integer) value).intValue();
+			if (mainAlignIndex >= 0 && mainAlignIndex < FLEX_ALIGNS.length) {
+				widget.setFlexMainAlign(FLEX_ALIGNS[mainAlignIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_CROSS_ALIGN:
-			try {
-				widget.setFlexCrossAlign(LvglWidget.FlexAlign.valueOf(strValue.toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				widget.setFlexCrossAlign(LvglWidget.FlexAlign.START);
+			int crossAlignIndex = ((Integer) value).intValue();
+			if (crossAlignIndex >= 0 && crossAlignIndex < FLEX_ALIGNS.length) {
+				widget.setFlexCrossAlign(FLEX_ALIGNS[crossAlignIndex]);
 			}
 			break;
 		case PROPERTY_FLEX_TRACK_ALIGN:
-			try {
-				widget.setFlexTrackAlign(LvglWidget.FlexAlign.valueOf(strValue.toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				widget.setFlexTrackAlign(LvglWidget.FlexAlign.START);
+			int trackAlignIndex = ((Integer) value).intValue();
+			if (trackAlignIndex >= 0 && trackAlignIndex < FLEX_ALIGNS.length) {
+				widget.setFlexTrackAlign(FLEX_ALIGNS[trackAlignIndex]);
 			}
 			break;
 		case PROPERTY_PAD_ROW:
-			widget.setPadRow(PropertyUtils.parseInt(strValue, 0));
+			widget.setPadRow(PropertyUtils.parseInt((String) value, 0));
 			break;
 		case PROPERTY_PAD_COLUMN:
-			widget.setPadColumn(PropertyUtils.parseInt(strValue, 0));
+			widget.setPadColumn(PropertyUtils.parseInt((String) value, 0));
 			break;
 		default:
 			break;

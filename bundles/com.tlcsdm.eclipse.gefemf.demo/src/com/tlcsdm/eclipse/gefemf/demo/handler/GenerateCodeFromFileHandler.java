@@ -14,7 +14,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -25,6 +24,7 @@ import com.tlcsdm.eclipse.gefemf.demo.model.LvglXmlSerializer;
 
 /**
  * Handler for generating C code from a selected gefxml file in the context menu.
+ * Outputs log messages to the console instead of showing dialogs.
  */
 public class GenerateCodeFromFileHandler extends AbstractHandler {
 
@@ -33,8 +33,7 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 
 		if (!(selection instanceof IStructuredSelection)) {
-			MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "Warning",
-					"Please select a .gefxml file.");
+			logToConsole("Warning: Please select a .gefxml file.");
 			return null;
 		}
 
@@ -42,15 +41,13 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 		Object firstElement = structuredSelection.getFirstElement();
 
 		if (!(firstElement instanceof IFile)) {
-			MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "Warning",
-					"Please select a .gefxml file.");
+			logToConsole("Warning: Please select a .gefxml file.");
 			return null;
 		}
 
 		IFile diagramFile = (IFile) firstElement;
 		if (!diagramFile.getName().endsWith(".gefxml")) {
-			MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "Warning",
-					"Please select a .gefxml file.");
+			logToConsole("Warning: Please select a .gefxml file.");
 			return null;
 		}
 
@@ -60,8 +57,7 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 			LvglScreen screen = serializer.load(diagramFile.getContents());
 
 			if (screen == null || screen.getWidgets().isEmpty()) {
-				MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "Warning",
-						"The screen is empty. Please add some widgets first.");
+				logToConsole("Warning: The screen is empty. Please add some widgets first.");
 				return null;
 			}
 
@@ -96,16 +92,19 @@ public class GenerateCodeFromFileHandler extends AbstractHandler {
 				sourceFile.create(cSource, true, new NullProgressMonitor());
 			}
 
-			MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "Code Generated",
-					"Successfully generated LVGL C code:\n" + headerFile.getFullPath().toString() + "\n"
-							+ sourceFile.getFullPath().toString());
+			logToConsole("Successfully generated LVGL C code:");
+			logToConsole("  " + headerFile.getFullPath().toString());
+			logToConsole("  " + sourceFile.getFullPath().toString());
 
 		} catch (Exception e) {
-			MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error",
-					"Failed to generate code: " + e.getMessage());
+			logToConsole("Error: Failed to generate code: " + e.getMessage());
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	private void logToConsole(String message) {
+		System.out.println("[LVGL Code Generator] " + message);
 	}
 }
