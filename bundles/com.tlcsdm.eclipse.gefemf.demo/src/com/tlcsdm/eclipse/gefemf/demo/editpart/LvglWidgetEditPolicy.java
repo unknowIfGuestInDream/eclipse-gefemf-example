@@ -11,6 +11,7 @@ import org.eclipse.gef.editpolicies.ComponentEditPolicy;
 import org.eclipse.gef.requests.GroupRequest;
 
 import com.tlcsdm.eclipse.gefemf.demo.command.LvglWidgetDeleteCommand;
+import com.tlcsdm.eclipse.gefemf.demo.command.LvglWidgetRemoveFromContainerCommand;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglScreen;
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 
@@ -26,6 +27,9 @@ public class LvglWidgetEditPolicy extends ComponentEditPolicy {
 
 		if (parent instanceof LvglScreen && child instanceof LvglWidget) {
 			return new LvglWidgetDeleteCommand((LvglScreen) parent, (LvglWidget) child);
+		} else if (parent instanceof LvglWidget && child instanceof LvglWidget) {
+			// Widget inside a container
+			return new LvglWidgetRemoveFromContainerCommand((LvglWidget) parent, (LvglWidget) child);
 		}
 		return null;
 	}

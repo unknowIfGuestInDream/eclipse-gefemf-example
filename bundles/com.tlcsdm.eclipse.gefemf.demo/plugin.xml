@@ -102,6 +102,31 @@
             </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generateFromFile"
+               icon="icons/generate.png"
+               label="Generate LVGL C Code"
+               style="push"
+               tooltip="Generate LVGL C Code from this diagram">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IFile">
+                     <test
+                           property="org.eclipse.core.resources.name"
+                           value="*.gefxml">
+                     </test>
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -109,12 +134,20 @@
             id="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
             name="Generate C Code">
       </command>
+      <command
+            id="com.tlcsdm.eclipse.gefemf.demo.commands.generateFromFile"
+            name="Generate LVGL C Code from File">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generate"
             class="com.tlcsdm.eclipse.gefemf.demo.handler.GenerateCodeHandler">
+      </handler>
+      <handler
+            commandId="com.tlcsdm.eclipse.gefemf.demo.commands.generateFromFile"
+            class="com.tlcsdm.eclipse.gefemf.demo.handler.GenerateCodeFromFileHandler">
       </handler>
    </extension>
 </plugin>

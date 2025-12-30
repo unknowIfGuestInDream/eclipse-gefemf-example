@@ -6,6 +6,9 @@
  ******************************************************************************/
 package com.tlcsdm.eclipse.gefemf.demo.property;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
@@ -31,11 +34,21 @@ public class LvglWidgetPropertySource implements IPropertySource {
 	private static final String PROPERTY_WIDTH = "width";
 	private static final String PROPERTY_HEIGHT = "height";
 	private static final String PROPERTY_TYPE = "type";
+	private static final String PROPERTY_IMAGE_SOURCE = "imageSource";
+	private static final String PROPERTY_LAYOUT_TYPE = "layoutType";
+	private static final String PROPERTY_FLEX_FLOW = "flexFlow";
+	private static final String PROPERTY_FLEX_MAIN_ALIGN = "flexMainAlign";
+	private static final String PROPERTY_FLEX_CROSS_ALIGN = "flexCrossAlign";
+	private static final String PROPERTY_FLEX_TRACK_ALIGN = "flexTrackAlign";
+	private static final String PROPERTY_PAD_ROW = "padRow";
+	private static final String PROPERTY_PAD_COLUMN = "padColumn";
 
 	private static final String CATEGORY_GENERAL = "General";
 	private static final String CATEGORY_POSITION = "Position";
 	private static final String CATEGORY_SIZE = "Size";
 	private static final String CATEGORY_STYLE = "Style";
+	private static final String CATEGORY_IMAGE = "Image";
+	private static final String CATEGORY_LAYOUT = "Layout";
 
 	private final LvglWidget widget;
 
@@ -50,63 +63,110 @@ public class LvglWidgetPropertySource implements IPropertySource {
 
 	@Override
 	public IPropertyDescriptor[] getPropertyDescriptors() {
+		List<IPropertyDescriptor> descriptors = new ArrayList<>();
+
 		// General properties
 		TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(PROPERTY_NAME, "Name");
 		nameDescriptor.setCategory(CATEGORY_GENERAL);
+		descriptors.add(nameDescriptor);
 
 		PropertyDescriptor typeDescriptor = new PropertyDescriptor(PROPERTY_TYPE, "Widget Type");
 		typeDescriptor.setCategory(CATEGORY_GENERAL);
+		descriptors.add(typeDescriptor);
 
 		TextPropertyDescriptor textDescriptor = new TextPropertyDescriptor(PROPERTY_TEXT, "Text");
 		textDescriptor.setCategory(CATEGORY_GENERAL);
+		descriptors.add(textDescriptor);
 
 		// Position properties
 		TextPropertyDescriptor xDescriptor = new TextPropertyDescriptor(PROPERTY_X, "X");
 		xDescriptor.setCategory(CATEGORY_POSITION);
+		descriptors.add(xDescriptor);
 
 		TextPropertyDescriptor yDescriptor = new TextPropertyDescriptor(PROPERTY_Y, "Y");
 		yDescriptor.setCategory(CATEGORY_POSITION);
+		descriptors.add(yDescriptor);
 
 		// Size properties
 		TextPropertyDescriptor widthDescriptor = new TextPropertyDescriptor(PROPERTY_WIDTH, "Width");
 		widthDescriptor.setCategory(CATEGORY_SIZE);
+		descriptors.add(widthDescriptor);
 
 		TextPropertyDescriptor heightDescriptor = new TextPropertyDescriptor(PROPERTY_HEIGHT, "Height");
 		heightDescriptor.setCategory(CATEGORY_SIZE);
+		descriptors.add(heightDescriptor);
 
 		// Style properties
 		TextPropertyDescriptor bgColorDescriptor = new TextPropertyDescriptor(PROPERTY_BG_COLOR, "Background Color");
 		bgColorDescriptor.setCategory(CATEGORY_STYLE);
 		bgColorDescriptor.setDescription("Background color in hex format (e.g., #FFFFFF)");
+		descriptors.add(bgColorDescriptor);
 
 		TextPropertyDescriptor textColorDescriptor = new TextPropertyDescriptor(PROPERTY_TEXT_COLOR, "Text Color");
 		textColorDescriptor.setCategory(CATEGORY_STYLE);
 		textColorDescriptor.setDescription("Text color in hex format (e.g., #000000)");
+		descriptors.add(textColorDescriptor);
 
 		TextPropertyDescriptor borderWidthDescriptor = new TextPropertyDescriptor(PROPERTY_BORDER_WIDTH, "Border Width");
 		borderWidthDescriptor.setCategory(CATEGORY_STYLE);
+		descriptors.add(borderWidthDescriptor);
 
 		TextPropertyDescriptor borderColorDescriptor = new TextPropertyDescriptor(PROPERTY_BORDER_COLOR, "Border Color");
 		borderColorDescriptor.setCategory(CATEGORY_STYLE);
 		borderColorDescriptor.setDescription("Border color in hex format (e.g., #000000)");
+		descriptors.add(borderColorDescriptor);
 
 		TextPropertyDescriptor radiusDescriptor = new TextPropertyDescriptor(PROPERTY_RADIUS, "Corner Radius");
 		radiusDescriptor.setCategory(CATEGORY_STYLE);
+		descriptors.add(radiusDescriptor);
 
-		return new IPropertyDescriptor[] {
-			nameDescriptor,
-			typeDescriptor,
-			textDescriptor,
-			xDescriptor,
-			yDescriptor,
-			widthDescriptor,
-			heightDescriptor,
-			bgColorDescriptor,
-			textColorDescriptor,
-			borderWidthDescriptor,
-			borderColorDescriptor,
-			radiusDescriptor
-		};
+		// Image-specific properties (only show for Image widgets)
+		if (widget.getWidgetType() == LvglWidget.WidgetType.IMAGE) {
+			TextPropertyDescriptor imageSourceDescriptor = new TextPropertyDescriptor(PROPERTY_IMAGE_SOURCE, "Image Source");
+			imageSourceDescriptor.setCategory(CATEGORY_IMAGE);
+			imageSourceDescriptor.setDescription("URL or path to the image resource (e.g., &image_name or path/to/image.png)");
+			descriptors.add(imageSourceDescriptor);
+		}
+
+		// Layout properties (only show for Container widgets)
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
+			TextPropertyDescriptor layoutTypeDescriptor = new TextPropertyDescriptor(PROPERTY_LAYOUT_TYPE, "Layout Type");
+			layoutTypeDescriptor.setCategory(CATEGORY_LAYOUT);
+			layoutTypeDescriptor.setDescription("Layout type: NONE, FLEX, or GRID");
+			descriptors.add(layoutTypeDescriptor);
+
+			TextPropertyDescriptor flexFlowDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_FLOW, "Flex Flow");
+			flexFlowDescriptor.setCategory(CATEGORY_LAYOUT);
+			flexFlowDescriptor.setDescription("Flex flow direction: ROW, COLUMN, ROW_WRAP, COLUMN_WRAP, ROW_REVERSE, COLUMN_REVERSE");
+			descriptors.add(flexFlowDescriptor);
+
+			TextPropertyDescriptor flexMainAlignDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_MAIN_ALIGN, "Flex Main Align");
+			flexMainAlignDescriptor.setCategory(CATEGORY_LAYOUT);
+			flexMainAlignDescriptor.setDescription("Main axis alignment: START, END, CENTER, SPACE_EVENLY, SPACE_AROUND, SPACE_BETWEEN");
+			descriptors.add(flexMainAlignDescriptor);
+
+			TextPropertyDescriptor flexCrossAlignDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_CROSS_ALIGN, "Flex Cross Align");
+			flexCrossAlignDescriptor.setCategory(CATEGORY_LAYOUT);
+			flexCrossAlignDescriptor.setDescription("Cross axis alignment: START, END, CENTER, SPACE_EVENLY, SPACE_AROUND, SPACE_BETWEEN");
+			descriptors.add(flexCrossAlignDescriptor);
+
+			TextPropertyDescriptor flexTrackAlignDescriptor = new TextPropertyDescriptor(PROPERTY_FLEX_TRACK_ALIGN, "Flex Track Align");
+			flexTrackAlignDescriptor.setCategory(CATEGORY_LAYOUT);
+			flexTrackAlignDescriptor.setDescription("Track alignment for wrapped content: START, END, CENTER, SPACE_EVENLY, SPACE_AROUND, SPACE_BETWEEN");
+			descriptors.add(flexTrackAlignDescriptor);
+
+			TextPropertyDescriptor padRowDescriptor = new TextPropertyDescriptor(PROPERTY_PAD_ROW, "Padding Row");
+			padRowDescriptor.setCategory(CATEGORY_LAYOUT);
+			padRowDescriptor.setDescription("Row padding between children (in pixels)");
+			descriptors.add(padRowDescriptor);
+
+			TextPropertyDescriptor padColumnDescriptor = new TextPropertyDescriptor(PROPERTY_PAD_COLUMN, "Padding Column");
+			padColumnDescriptor.setCategory(CATEGORY_LAYOUT);
+			padColumnDescriptor.setDescription("Column padding between children (in pixels)");
+			descriptors.add(padColumnDescriptor);
+		}
+
+		return descriptors.toArray(new IPropertyDescriptor[0]);
 	}
 
 	@Override
@@ -136,6 +196,22 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			return PropertyUtils.formatColor(widget.getBorderColor());
 		case PROPERTY_RADIUS:
 			return String.valueOf(widget.getRadius());
+		case PROPERTY_IMAGE_SOURCE:
+			return widget.getImageSource();
+		case PROPERTY_LAYOUT_TYPE:
+			return widget.getLayoutType().name();
+		case PROPERTY_FLEX_FLOW:
+			return widget.getFlexFlow().name();
+		case PROPERTY_FLEX_MAIN_ALIGN:
+			return widget.getFlexMainAlign().name();
+		case PROPERTY_FLEX_CROSS_ALIGN:
+			return widget.getFlexCrossAlign().name();
+		case PROPERTY_FLEX_TRACK_ALIGN:
+			return widget.getFlexTrackAlign().name();
+		case PROPERTY_PAD_ROW:
+			return String.valueOf(widget.getPadRow());
+		case PROPERTY_PAD_COLUMN:
+			return String.valueOf(widget.getPadColumn());
 		default:
 			return null;
 		}
@@ -170,6 +246,30 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			break;
 		case PROPERTY_RADIUS:
 			widget.setRadius(0);
+			break;
+		case PROPERTY_IMAGE_SOURCE:
+			widget.setImageSource("");
+			break;
+		case PROPERTY_LAYOUT_TYPE:
+			widget.setLayoutType(LvglWidget.LayoutType.NONE);
+			break;
+		case PROPERTY_FLEX_FLOW:
+			widget.setFlexFlow(LvglWidget.FlexFlow.ROW);
+			break;
+		case PROPERTY_FLEX_MAIN_ALIGN:
+			widget.setFlexMainAlign(LvglWidget.FlexAlign.START);
+			break;
+		case PROPERTY_FLEX_CROSS_ALIGN:
+			widget.setFlexCrossAlign(LvglWidget.FlexAlign.START);
+			break;
+		case PROPERTY_FLEX_TRACK_ALIGN:
+			widget.setFlexTrackAlign(LvglWidget.FlexAlign.START);
+			break;
+		case PROPERTY_PAD_ROW:
+			widget.setPadRow(0);
+			break;
+		case PROPERTY_PAD_COLUMN:
+			widget.setPadColumn(0);
 			break;
 		default:
 			break;
@@ -212,6 +312,50 @@ public class LvglWidgetPropertySource implements IPropertySource {
 			break;
 		case PROPERTY_RADIUS:
 			widget.setRadius(PropertyUtils.parseInt(strValue, 0));
+			break;
+		case PROPERTY_IMAGE_SOURCE:
+			widget.setImageSource(strValue);
+			break;
+		case PROPERTY_LAYOUT_TYPE:
+			try {
+				widget.setLayoutType(LvglWidget.LayoutType.valueOf(strValue.toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				widget.setLayoutType(LvglWidget.LayoutType.NONE);
+			}
+			break;
+		case PROPERTY_FLEX_FLOW:
+			try {
+				widget.setFlexFlow(LvglWidget.FlexFlow.valueOf(strValue.toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexFlow(LvglWidget.FlexFlow.ROW);
+			}
+			break;
+		case PROPERTY_FLEX_MAIN_ALIGN:
+			try {
+				widget.setFlexMainAlign(LvglWidget.FlexAlign.valueOf(strValue.toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexMainAlign(LvglWidget.FlexAlign.START);
+			}
+			break;
+		case PROPERTY_FLEX_CROSS_ALIGN:
+			try {
+				widget.setFlexCrossAlign(LvglWidget.FlexAlign.valueOf(strValue.toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexCrossAlign(LvglWidget.FlexAlign.START);
+			}
+			break;
+		case PROPERTY_FLEX_TRACK_ALIGN:
+			try {
+				widget.setFlexTrackAlign(LvglWidget.FlexAlign.valueOf(strValue.toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexTrackAlign(LvglWidget.FlexAlign.START);
+			}
+			break;
+		case PROPERTY_PAD_ROW:
+			widget.setPadRow(PropertyUtils.parseInt(strValue, 0));
+			break;
+		case PROPERTY_PAD_COLUMN:
+			widget.setPadColumn(PropertyUtils.parseInt(strValue, 0));
 			break;
 		default:
 			break;

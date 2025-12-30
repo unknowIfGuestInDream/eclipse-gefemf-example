@@ -101,6 +101,24 @@ public class LvglXmlSerializer {
 		element.setAttribute("borderColor", formatColor(widget.getBorderColor()));
 		element.setAttribute("radius", String.valueOf(widget.getRadius()));
 
+		// Image-specific property
+		if (widget.getWidgetType() == LvglWidget.WidgetType.IMAGE && widget.getImageSource() != null && !widget.getImageSource().isEmpty()) {
+			element.setAttribute("imageSource", widget.getImageSource());
+		}
+
+		// Layout properties (for containers)
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER) {
+			element.setAttribute("layoutType", widget.getLayoutType().name());
+			if (widget.getLayoutType() == LvglWidget.LayoutType.FLEX) {
+				element.setAttribute("flexFlow", widget.getFlexFlow().name());
+				element.setAttribute("flexMainAlign", widget.getFlexMainAlign().name());
+				element.setAttribute("flexCrossAlign", widget.getFlexCrossAlign().name());
+				element.setAttribute("flexTrackAlign", widget.getFlexTrackAlign().name());
+			}
+			element.setAttribute("padRow", String.valueOf(widget.getPadRow()));
+			element.setAttribute("padColumn", String.valueOf(widget.getPadColumn()));
+		}
+
 		// Add child widgets
 		for (LvglWidget child : widget.getChildren()) {
 			Element childElement = createWidgetElement(doc, child);
@@ -136,6 +154,56 @@ public class LvglXmlSerializer {
 		widget.setBorderWidth(parseInt(element.getAttribute("borderWidth"), 0));
 		widget.setBorderColor(parseColor(element.getAttribute("borderColor")));
 		widget.setRadius(parseInt(element.getAttribute("radius"), 0));
+
+		// Image-specific property
+		String imageSource = element.getAttribute("imageSource");
+		if (imageSource != null && !imageSource.isEmpty()) {
+			widget.setImageSource(imageSource);
+		}
+
+		// Layout properties
+		String layoutTypeStr = element.getAttribute("layoutType");
+		if (layoutTypeStr != null && !layoutTypeStr.isEmpty()) {
+			try {
+				widget.setLayoutType(LvglWidget.LayoutType.valueOf(layoutTypeStr));
+			} catch (IllegalArgumentException e) {
+				widget.setLayoutType(LvglWidget.LayoutType.NONE);
+			}
+		}
+		String flexFlowStr = element.getAttribute("flexFlow");
+		if (flexFlowStr != null && !flexFlowStr.isEmpty()) {
+			try {
+				widget.setFlexFlow(LvglWidget.FlexFlow.valueOf(flexFlowStr));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexFlow(LvglWidget.FlexFlow.ROW);
+			}
+		}
+		String flexMainAlignStr = element.getAttribute("flexMainAlign");
+		if (flexMainAlignStr != null && !flexMainAlignStr.isEmpty()) {
+			try {
+				widget.setFlexMainAlign(LvglWidget.FlexAlign.valueOf(flexMainAlignStr));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexMainAlign(LvglWidget.FlexAlign.START);
+			}
+		}
+		String flexCrossAlignStr = element.getAttribute("flexCrossAlign");
+		if (flexCrossAlignStr != null && !flexCrossAlignStr.isEmpty()) {
+			try {
+				widget.setFlexCrossAlign(LvglWidget.FlexAlign.valueOf(flexCrossAlignStr));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexCrossAlign(LvglWidget.FlexAlign.START);
+			}
+		}
+		String flexTrackAlignStr = element.getAttribute("flexTrackAlign");
+		if (flexTrackAlignStr != null && !flexTrackAlignStr.isEmpty()) {
+			try {
+				widget.setFlexTrackAlign(LvglWidget.FlexAlign.valueOf(flexTrackAlignStr));
+			} catch (IllegalArgumentException e) {
+				widget.setFlexTrackAlign(LvglWidget.FlexAlign.START);
+			}
+		}
+		widget.setPadRow(parseInt(element.getAttribute("padRow"), 0));
+		widget.setPadColumn(parseInt(element.getAttribute("padColumn"), 0));
 
 		// Parse child widgets
 		NodeList children = element.getElementsByTagName("widget");

@@ -15,9 +15,22 @@ import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
 public class LvglCodeGenerator {
 
 	private final LvglScreen screen;
+	private final String baseName;
 
 	public LvglCodeGenerator(LvglScreen screen) {
+		this(screen, null);
+	}
+
+	public LvglCodeGenerator(LvglScreen screen, String baseName) {
 		this.screen = screen;
+		this.baseName = baseName;
+	}
+
+	/**
+	 * Get the name to use for file generation (file base name if provided, otherwise screen name).
+	 */
+	private String getGenerationName() {
+		return (baseName != null && !baseName.isEmpty()) ? baseName : screen.getName();
 	}
 
 	/**
@@ -25,10 +38,13 @@ public class LvglCodeGenerator {
 	 */
 	public String generateHeader() {
 		StringBuilder sb = new StringBuilder();
-		String guardName = screen.getName().toUpperCase() + "_H";
+		String generationName = getGenerationName();
+		// Sanitize identifiers used in C code
+		String identifier = sanitizeIdentifier(generationName);
+		String guardName = identifier.toUpperCase() + "_H";
 
 		sb.append("/**\n");
-		sb.append(" * @file ").append(screen.getName()).append(".h\n");
+		sb.append(" * @file ").append(generationName).append(".h\n");
 		sb.append(" * @brief LVGL UI screen header - auto-generated\n");
 		sb.append(" */\n\n");
 
@@ -42,7 +58,7 @@ public class LvglCodeGenerator {
 		sb.append("#endif\n\n");
 
 		// Declare screen object
-		sb.append("extern lv_obj_t *").append(screen.getName()).append(";\n\n");
+		sb.append("extern lv_obj_t *").append(identifier).append(";\n\n");
 
 		// Declare widget objects
 		for (LvglWidget widget : screen.getWidgets()) {
@@ -52,8 +68,8 @@ public class LvglCodeGenerator {
 		sb.append("\n");
 
 		// Function declarations
-		sb.append("void ").append(screen.getName()).append("_create(void);\n");
-		sb.append("void ").append(screen.getName()).append("_delete(void);\n");
+		sb.append("void ").append(identifier).append("_create(void);\n");
+		sb.append("void ").append(identifier).append("_delete(void);\n");
 
 		sb.append("\n#ifdef __cplusplus\n");
 		sb.append("}\n");
@@ -69,16 +85,19 @@ public class LvglCodeGenerator {
 	 */
 	public String generateSource() {
 		StringBuilder sb = new StringBuilder();
+		String generationName = getGenerationName();
+		// Sanitize the identifier used in C code
+		String identifier = sanitizeIdentifier(generationName);
 
 		sb.append("/**\n");
-		sb.append(" * @file ").append(screen.getName()).append(".c\n");
+		sb.append(" * @file ").append(generationName).append(".c\n");
 		sb.append(" * @brief LVGL UI screen implementation - auto-generated\n");
 		sb.append(" */\n\n");
 
-		sb.append("#include \"").append(screen.getName()).append(".h\"\n\n");
+		sb.append("#include \"").append(generationName).append(".h\"\n\n");
 
 		// Define screen object
-		sb.append("lv_obj_t *").append(screen.getName()).append(" = NULL;\n\n");
+		sb.append("lv_obj_t *").append(identifier).append(" = NULL;\n\n");
 
 		// Define widget objects
 		for (LvglWidget widget : screen.getWidgets()) {
@@ -88,26 +107,26 @@ public class LvglCodeGenerator {
 		sb.append("\n");
 
 		// Create function
-		sb.append("void ").append(screen.getName()).append("_create(void) {\n");
-		sb.append("    ").append(screen.getName()).append(" = lv_obj_create(NULL);\n");
-		sb.append("    lv_obj_set_size(").append(screen.getName()).append(", ");
+		sb.append("void ").append(identifier).append("_create(void) {\n");
+		sb.append("    ").append(identifier).append(" = lv_obj_create(NULL);\n");
+		sb.append("    lv_obj_set_size(").append(identifier).append(", ");
 		sb.append(screen.getWidth()).append(", ").append(screen.getHeight()).append(");\n");
-		sb.append("    lv_obj_set_style_bg_color(").append(screen.getName());
+		sb.append("    lv_obj_set_style_bg_color(").append(identifier);
 		sb.append(", lv_color_hex(0x").append(String.format("%06X", screen.getBgColor()));
 		sb.append("), LV_PART_MAIN);\n\n");
 
 		// Create widgets
 		for (LvglWidget widget : screen.getWidgets()) {
-			generateWidgetCreation(sb, widget, screen.getName(), "    ");
+			generateWidgetCreation(sb, widget, identifier, "    ");
 		}
 
 		sb.append("}\n\n");
 
 		// Delete function
-		sb.append("void ").append(screen.getName()).append("_delete(void) {\n");
-		sb.append("    if (").append(screen.getName()).append(" != NULL) {\n");
-		sb.append("        lv_obj_del(").append(screen.getName()).append(");\n");
-		sb.append("        ").append(screen.getName()).append(" = NULL;\n");
+		sb.append("void ").append(identifier).append("_delete(void) {\n");
+		sb.append("    if (").append(identifier).append(" != NULL) {\n");
+		sb.append("        lv_obj_del(").append(identifier).append(");\n");
+		sb.append("        ").append(identifier).append(" = NULL;\n");
 		sb.append("    }\n");
 		sb.append("}\n");
 
@@ -176,6 +195,21 @@ public class LvglCodeGenerator {
 			}
 		}
 
+		// Set image source if applicable
+		if (widget.getWidgetType() == LvglWidget.WidgetType.IMAGE) {
+			String imageSource = widget.getImageSource();
+			if (imageSource != null && !imageSource.isEmpty()) {
+				// Validate image source - should be either:
+				// 1. A pointer reference like &image_name (alphanumeric + underscore after &)
+				// 2. A string path like "path/to/image.png" (must be properly quoted)
+				String validatedSource = validateImageSource(imageSource);
+				if (validatedSource != null) {
+					sb.append(indent).append("lv_img_set_src(").append(varName);
+					sb.append(", ").append(validatedSource).append(");\n");
+				}
+			}
+		}
+
 		// Set background color
 		if (widget.getBgColor() != 0xFFFFFF) {
 			sb.append(indent).append("lv_obj_set_style_bg_color(").append(varName);
@@ -206,11 +240,46 @@ public class LvglCodeGenerator {
 			sb.append(", ").append(widget.getRadius()).append(", LV_PART_MAIN);\n");
 		}
 
+		// Set layout for containers
+		if (widget.getWidgetType() == LvglWidget.WidgetType.CONTAINER && widget.getLayoutType() != LvglWidget.LayoutType.NONE) {
+			generateLayoutCode(sb, widget, varName, indent);
+		}
+
 		sb.append("\n");
 
 		// Create child widgets
 		for (LvglWidget child : widget.getChildren()) {
 			generateWidgetCreation(sb, child, varName, indent);
+		}
+	}
+
+	private void generateLayoutCode(StringBuilder sb, LvglWidget widget, String varName, String indent) {
+		LvglWidget.LayoutType layoutType = widget.getLayoutType();
+
+		if (layoutType == LvglWidget.LayoutType.FLEX) {
+			// Set flex layout
+			sb.append(indent).append("lv_obj_set_layout(").append(varName).append(", LV_LAYOUT_FLEX);\n");
+			
+			// Set flex flow
+			sb.append(indent).append("lv_obj_set_flex_flow(").append(varName).append(", ");
+			sb.append(widget.getFlexFlow().getLvglConstant()).append(");\n");
+			
+			// Set flex alignment
+			sb.append(indent).append("lv_obj_set_flex_align(").append(varName).append(", ");
+			sb.append(widget.getFlexMainAlign().getLvglConstant()).append(", ");
+			sb.append(widget.getFlexCrossAlign().getLvglConstant()).append(", ");
+			sb.append(widget.getFlexTrackAlign().getLvglConstant()).append(");\n");
+		} else if (layoutType == LvglWidget.LayoutType.GRID) {
+			// Set grid layout
+			sb.append(indent).append("lv_obj_set_layout(").append(varName).append(", LV_LAYOUT_GRID);\n");
+		}
+
+		// Set padding for layout
+		if (widget.getPadRow() > 0 || widget.getPadColumn() > 0) {
+			sb.append(indent).append("lv_obj_set_style_pad_row(").append(varName);
+			sb.append(", ").append(widget.getPadRow()).append(", LV_PART_MAIN);\n");
+			sb.append(indent).append("lv_obj_set_style_pad_column(").append(varName);
+			sb.append(", ").append(widget.getPadColumn()).append(", LV_PART_MAIN);\n");
 		}
 	}
 
@@ -244,5 +313,75 @@ public class LvglCodeGenerator {
 
 	private String escapeString(String str) {
 		return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+	}
+
+	/**
+	 * Sanitize a string to be a valid C identifier.
+	 * Replaces invalid characters with underscores.
+	 */
+	private String sanitizeIdentifier(String str) {
+		if (str == null || str.isEmpty()) {
+			return "_";
+		}
+		String sanitized = str.replaceAll("[^a-zA-Z0-9_]", "_");
+		// C identifiers cannot start with a digit
+		if (Character.isDigit(sanitized.charAt(0))) {
+			sanitized = "_" + sanitized;
+		}
+		return sanitized;
+	}
+
+	/**
+	 * Validate and sanitize image source for safe inclusion in C code.
+	 * Returns null if the source is invalid.
+	 * 
+	 * Valid formats:
+	 * - Pointer reference: &identifier (e.g., &my_image)
+	 * - String path: "path/to/image" (will be quoted if not already)
+	 * - LV_SYMBOL constants: LV_SYMBOL_* macros
+	 */
+	private String validateImageSource(String source) {
+		if (source == null || source.isEmpty()) {
+			return null;
+		}
+		
+		String trimmed = source.trim();
+		
+		// Check for pointer reference (e.g., &image_name)
+		if (trimmed.startsWith("&")) {
+			String identifier = trimmed.substring(1);
+			// Validate the identifier part
+			if (identifier.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
+				return trimmed;
+			}
+			return null;
+		}
+		
+		// Check for LV_SYMBOL macro
+		if (trimmed.startsWith("LV_SYMBOL_")) {
+			if (trimmed.matches("LV_SYMBOL_[A-Z_]+")) {
+				return trimmed;
+			}
+			return null;
+		}
+		
+		// For string paths, ensure it's properly quoted
+		if (trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+			// Already quoted - validate and escape the content
+			String content = trimmed.substring(1, trimmed.length() - 1);
+			// Basic path validation - no code injection characters
+			if (!content.matches(".*[;{}()\\[\\]].*")) {
+				return "\"" + escapeString(content) + "\"";
+			}
+			return null;
+		}
+		
+		// Unquoted string - treat as path and add quotes
+		// Basic path validation - no code injection characters
+		if (!trimmed.matches(".*[;{}()\\[\\]&].*")) {
+			return "\"" + escapeString(trimmed) + "\"";
+		}
+		
+		return null;
 	}
 }
