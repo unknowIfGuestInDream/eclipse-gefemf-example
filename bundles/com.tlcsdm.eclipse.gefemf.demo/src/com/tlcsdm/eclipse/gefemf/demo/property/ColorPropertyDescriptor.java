@@ -7,6 +7,8 @@
 package com.tlcsdm.eclipse.gefemf.demo.property;
 
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
@@ -23,6 +25,19 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 public class ColorPropertyDescriptor extends PropertyDescriptor {
 
 	/**
+	 * Label provider that formats RGB colors as hex strings (e.g., "#FFFFFF").
+	 */
+	private static final ILabelProvider COLOR_LABEL_PROVIDER = new LabelProvider() {
+		@Override
+		public String getText(Object element) {
+			if (element instanceof RGB rgb) {
+				return String.format("#%02X%02X%02X", rgb.red, rgb.green, rgb.blue);
+			}
+			return "";
+		}
+	};
+
+	/**
 	 * Creates a new color property descriptor.
 	 *
 	 * @param id the id of the property
@@ -30,6 +45,7 @@ public class ColorPropertyDescriptor extends PropertyDescriptor {
 	 */
 	public ColorPropertyDescriptor(Object id, String displayName) {
 		super(id, displayName);
+		setLabelProvider(COLOR_LABEL_PROVIDER);
 	}
 
 	@Override

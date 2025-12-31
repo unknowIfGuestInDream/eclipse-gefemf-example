@@ -7,14 +7,30 @@
 package com.tlcsdm.eclipse.gefemf.demo.property;
 
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 /**
  * Property descriptor for boolean/checkbox properties that provides a checkbox widget for editing.
  * This provides a more intuitive UI compared to using a dropdown with "true"/"false" options.
+ * <p>
+ * The label provider is configured to show no text, so only the checkbox is visible.
+ * </p>
  */
 public class CheckboxPropertyDescriptor extends PropertyDescriptor {
+
+	/**
+	 * Label provider that returns empty string to hide the "true"/"false" text.
+	 * Users will only see the checkbox control.
+	 */
+	private static final ILabelProvider CHECKBOX_LABEL_PROVIDER = new LabelProvider() {
+		@Override
+		public String getText(Object element) {
+			return "";
+		}
+	};
 
 	/**
 	 * Creates a new checkbox property descriptor.
@@ -24,6 +40,7 @@ public class CheckboxPropertyDescriptor extends PropertyDescriptor {
 	 */
 	public CheckboxPropertyDescriptor(Object id, String displayName) {
 		super(id, displayName);
+		setLabelProvider(CHECKBOX_LABEL_PROVIDER);
 	}
 
 	@Override
