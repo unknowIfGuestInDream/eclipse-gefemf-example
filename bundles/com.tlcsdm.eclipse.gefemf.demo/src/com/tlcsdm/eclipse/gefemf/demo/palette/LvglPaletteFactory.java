@@ -35,24 +35,28 @@ public class LvglPaletteFactory {
 
 		palette.add(toolsDrawer);
 
-		// Basic Widgets group
-		PaletteDrawer basicDrawer = new PaletteDrawer("Basic Widgets");
+		// Basic Widgets group - core LVGL widgets for layout and display
+		PaletteDrawer basicDrawer = new PaletteDrawer("Basic");
 
+		// Container and layout
+		basicDrawer.add(createWidgetEntry("Container", "Create an LVGL container", LvglWidget.WidgetType.CONTAINER));
 		// Button
 		basicDrawer.add(createWidgetEntry("Button", "Create an LVGL button", LvglWidget.WidgetType.BUTTON));
 		// Label
 		basicDrawer.add(createWidgetEntry("Label", "Create an LVGL label", LvglWidget.WidgetType.LABEL));
-		// Container
-		basicDrawer.add(createWidgetEntry("Container", "Create an LVGL container", LvglWidget.WidgetType.CONTAINER));
 		// Image
 		basicDrawer.add(createWidgetEntry("Image", "Create an LVGL image", LvglWidget.WidgetType.IMAGE));
 		// Line
 		basicDrawer.add(createWidgetEntry("Line", "Create an LVGL line", LvglWidget.WidgetType.LINE));
+		// Arc
+		basicDrawer.add(createWidgetEntry("Arc", "Create an LVGL arc", LvglWidget.WidgetType.ARC));
+		// Bar
+		basicDrawer.add(createWidgetEntry("Bar", "Create an LVGL progress bar", LvglWidget.WidgetType.BAR));
 
 		palette.add(basicDrawer);
 
-		// Input Widgets group
-		PaletteDrawer inputDrawer = new PaletteDrawer("Input Widgets");
+		// Input Widgets group - user input components
+		PaletteDrawer inputDrawer = new PaletteDrawer("Input");
 
 		// Slider
 		inputDrawer.add(createWidgetEntry("Slider", "Create an LVGL slider", LvglWidget.WidgetType.SLIDER));
@@ -75,67 +79,45 @@ public class LvglPaletteFactory {
 
 		palette.add(inputDrawer);
 
-		// Display Widgets group
-		PaletteDrawer displayDrawer = new PaletteDrawer("Display Widgets");
+		// Advanced Widgets group - complex display and container widgets
+		PaletteDrawer advancedDrawer = new PaletteDrawer("Advanced");
 
-		// Arc
-		displayDrawer.add(createWidgetEntry("Arc", "Create an LVGL arc", LvglWidget.WidgetType.ARC));
-		// Bar
-		displayDrawer.add(createWidgetEntry("Bar", "Create an LVGL progress bar", LvglWidget.WidgetType.BAR));
 		// LED
-		displayDrawer.add(createWidgetEntry("LED", "Create an LVGL LED", LvglWidget.WidgetType.LED));
+		advancedDrawer.add(createWidgetEntry("LED", "Create an LVGL LED", LvglWidget.WidgetType.LED));
 		// Scale
-		displayDrawer.add(createWidgetEntry("Scale", "Create an LVGL scale", LvglWidget.WidgetType.SCALE));
+		advancedDrawer.add(createWidgetEntry("Scale", "Create an LVGL scale", LvglWidget.WidgetType.SCALE));
 		// Spinner
-		displayDrawer.add(createWidgetEntry("Spinner", "Create an LVGL spinner", LvglWidget.WidgetType.SPINNER));
+		advancedDrawer.add(createWidgetEntry("Spinner", "Create an LVGL spinner", LvglWidget.WidgetType.SPINNER));
 		// Animation Image
-		displayDrawer.add(createWidgetEntry("Animation Image", "Create an LVGL animation image", LvglWidget.WidgetType.ANIMIMG));
+		advancedDrawer.add(createWidgetEntry("Animation Image", "Create an LVGL animation image", LvglWidget.WidgetType.ANIMIMG));
 		// Arc Label
-		displayDrawer.add(createWidgetEntry("Arc Label", "Create an LVGL arc label", LvglWidget.WidgetType.ARCLABEL));
-
-		palette.add(displayDrawer);
-
-		// Data Widgets group
-		PaletteDrawer dataDrawer = new PaletteDrawer("Data Widgets");
-
+		advancedDrawer.add(createWidgetEntry("Arc Label", "Create an LVGL arc label", LvglWidget.WidgetType.ARCLABEL));
 		// Chart
-		dataDrawer.add(createWidgetEntry("Chart", "Create an LVGL chart", LvglWidget.WidgetType.CHART));
+		advancedDrawer.add(createWidgetEntry("Chart", "Create an LVGL chart", LvglWidget.WidgetType.CHART));
 		// Table
-		dataDrawer.add(createWidgetEntry("Table", "Create an LVGL table", LvglWidget.WidgetType.TABLE));
+		advancedDrawer.add(createWidgetEntry("Table", "Create an LVGL table", LvglWidget.WidgetType.TABLE));
 		// Calendar
-		dataDrawer.add(createWidgetEntry("Calendar", "Create an LVGL calendar", LvglWidget.WidgetType.CALENDAR));
+		advancedDrawer.add(createWidgetEntry("Calendar", "Create an LVGL calendar", LvglWidget.WidgetType.CALENDAR));
 		// Spangroup
-		dataDrawer.add(createWidgetEntry("Spangroup", "Create an LVGL spangroup", LvglWidget.WidgetType.SPANGROUP));
-
-		palette.add(dataDrawer);
-
-		// Container Widgets group
-		PaletteDrawer containerDrawer = new PaletteDrawer("Container Widgets");
-
+		advancedDrawer.add(createWidgetEntry("Spangroup", "Create an LVGL spangroup", LvglWidget.WidgetType.SPANGROUP));
 		// List
-		containerDrawer.add(createWidgetEntry("List", "Create an LVGL list", LvglWidget.WidgetType.LIST));
+		advancedDrawer.add(createWidgetEntry("List", "Create an LVGL list", LvglWidget.WidgetType.LIST));
 		// Menu
-		containerDrawer.add(createWidgetEntry("Menu", "Create an LVGL menu", LvglWidget.WidgetType.MENU));
+		advancedDrawer.add(createWidgetEntry("Menu", "Create an LVGL menu", LvglWidget.WidgetType.MENU));
 		// Tab View
-		containerDrawer.add(createWidgetEntry("Tab View", "Create an LVGL tab view", LvglWidget.WidgetType.TABVIEW));
+		advancedDrawer.add(createWidgetEntry("Tab View", "Create an LVGL tab view", LvglWidget.WidgetType.TABVIEW));
 		// Tile View
-		containerDrawer.add(createWidgetEntry("Tile View", "Create an LVGL tile view", LvglWidget.WidgetType.TILEVIEW));
+		advancedDrawer.add(createWidgetEntry("Tile View", "Create an LVGL tile view", LvglWidget.WidgetType.TILEVIEW));
 		// Window
-		containerDrawer.add(createWidgetEntry("Window", "Create an LVGL window", LvglWidget.WidgetType.WIN));
+		advancedDrawer.add(createWidgetEntry("Window", "Create an LVGL window", LvglWidget.WidgetType.WIN));
 		// Message Box
-		containerDrawer.add(createWidgetEntry("Message Box", "Create an LVGL message box", LvglWidget.WidgetType.MSGBOX));
-
-		palette.add(containerDrawer);
-
-		// Special Widgets group
-		PaletteDrawer specialDrawer = new PaletteDrawer("Special Widgets");
-
+		advancedDrawer.add(createWidgetEntry("Message Box", "Create an LVGL message box", LvglWidget.WidgetType.MSGBOX));
 		// Image Button
-		specialDrawer.add(createWidgetEntry("Image Button", "Create an LVGL image button", LvglWidget.WidgetType.IMAGEBUTTON));
+		advancedDrawer.add(createWidgetEntry("Image Button", "Create an LVGL image button", LvglWidget.WidgetType.IMAGEBUTTON));
 		// Canvas
-		specialDrawer.add(createWidgetEntry("Canvas", "Create an LVGL canvas", LvglWidget.WidgetType.CANVAS));
+		advancedDrawer.add(createWidgetEntry("Canvas", "Create an LVGL canvas", LvglWidget.WidgetType.CANVAS));
 
-		palette.add(specialDrawer);
+		palette.add(advancedDrawer);
 
 		return palette;
 	}
