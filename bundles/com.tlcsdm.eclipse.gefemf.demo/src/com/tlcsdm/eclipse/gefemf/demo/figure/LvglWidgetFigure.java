@@ -147,6 +147,12 @@ public class LvglWidgetFigure extends Figure {
 			return ColorConstants.lightGray;
 		case CONTAINER:
 			return ColorConstants.white;
+		case LINE:
+			return ColorConstants.white;
+		case LED:
+			return ColorConstants.white;
+		case SPINNER:
+			return ColorConstants.white;
 		default:
 			return ColorConstants.white;
 		}
@@ -191,6 +197,15 @@ public class LvglWidgetFigure extends Figure {
 			break;
 		case TABLE:
 			drawTable(g, r);
+			break;
+		case LINE:
+			drawLine(g, r);
+			break;
+		case LED:
+			drawLed(g, r);
+			break;
+		case SPINNER:
+			drawSpinner(g, r);
 			break;
 		default:
 			drawDefault(g, r);
@@ -413,6 +428,68 @@ public class LvglWidgetFigure extends Figure {
 			int y = r.y + 3 + i * rowHeight;
 			g.drawLine(r.x + 3, y, r.x + r.width - 4, y);
 		}
+	}
+
+	private void drawLine(Graphics g, Rectangle r) {
+		// Draw an LVGL-style line widget
+		// Clear background first
+		g.setBackgroundColor(ColorConstants.white);
+		g.fillRectangle(r.x, r.y, r.width, r.height);
+		
+		// Draw a horizontal line centered in the widget bounds
+		int lineY = r.y + r.height / 2;
+		int lineThickness = Math.max(2, Math.min(6, r.height / 3));
+		
+		// Draw line with LVGL-style appearance (rounded ends)
+		g.setBackgroundColor(ColorConstants.darkGray);
+		g.fillRoundRectangle(new Rectangle(r.x + 4, lineY - lineThickness / 2, r.width - 8, lineThickness), lineThickness, lineThickness);
+		
+		// Draw subtle border for better visibility
+		g.setForegroundColor(ColorConstants.gray);
+		g.setLineStyle(SWT.LINE_DOT);
+		g.drawRectangle(r.x + 1, r.y + 1, r.width - 3, r.height - 3);
+		g.setLineStyle(SWT.LINE_SOLID);
+	}
+
+	private void drawLed(Graphics g, Rectangle r) {
+		// Draw an LVGL-style LED widget
+		// LED uses the 'checked' property to represent on/off state (like LVGL lv_led_on/off)
+		int size = Math.min(r.width - 6, r.height - 6);
+		int centerX = r.x + r.width / 2;
+		int centerY = r.y + r.height / 2;
+		
+		// Draw LED body (circular with gradient-like effect)
+		// Green when on (checked=true), dark gray when off (checked=false)
+		g.setBackgroundColor(checked ? ColorConstants.green : ColorConstants.darkGray);
+		g.fillOval(centerX - size / 2, centerY - size / 2, size, size);
+		
+		// Draw highlight for 3D effect when LED is on
+		if (checked) {
+			g.setBackgroundColor(ColorConstants.lightGreen);
+			g.fillOval(centerX - size / 4, centerY - size / 4, size / 3, size / 3);
+		}
+		
+		// Draw border
+		g.setForegroundColor(ColorConstants.black);
+		g.drawOval(centerX - size / 2, centerY - size / 2, size - 1, size - 1);
+	}
+
+	private void drawSpinner(Graphics g, Rectangle r) {
+		// Draw an LVGL-style loading spinner
+		int size = Math.min(r.width - 6, r.height - 6);
+		int centerX = r.x + r.width / 2;
+		int centerY = r.y + r.height / 2;
+		int radius = size / 2;
+		
+		// Draw spinner track (light gray circle)
+		g.setForegroundColor(ColorConstants.lightGray);
+		g.setLineWidth(4);
+		g.drawOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
+		
+		// Draw spinning indicator (arc portion)
+		g.setForegroundColor(ColorConstants.blue);
+		g.drawArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 45, 90);
+		g.setLineWidth(1);
 	}
 
 	private void drawDefault(Graphics g, Rectangle r) {
