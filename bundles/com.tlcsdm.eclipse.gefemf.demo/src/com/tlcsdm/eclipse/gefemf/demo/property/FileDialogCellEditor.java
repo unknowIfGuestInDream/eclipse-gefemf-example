@@ -131,7 +131,7 @@ public class FileDialogCellEditor extends DialogCellEditor {
 				}
 			}
 		} catch (Exception e) {
-			// Fall back to workspace root
+			// Ignore - will fall back to workspace root
 		}
 		
 		// Fall back to workspace root
