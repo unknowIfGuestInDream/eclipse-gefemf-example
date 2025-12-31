@@ -6,6 +6,7 @@
  ******************************************************************************/
 package com.tlcsdm.eclipse.gefemf.demo.property;
 
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
@@ -51,10 +52,10 @@ public class LvglScreenPropertySource implements IPropertySource {
 		TextPropertyDescriptor heightDescriptor = new TextPropertyDescriptor(PROPERTY_HEIGHT, "Height");
 		heightDescriptor.setCategory(CATEGORY_SIZE);
 
-		// Style properties
-		TextPropertyDescriptor bgColorDescriptor = new TextPropertyDescriptor(PROPERTY_BG_COLOR, "Background Color");
+		// Style properties - Use ColorPropertyDescriptor for color dialog
+		ColorPropertyDescriptor bgColorDescriptor = new ColorPropertyDescriptor(PROPERTY_BG_COLOR, "Background Color");
 		bgColorDescriptor.setCategory(CATEGORY_STYLE);
-		bgColorDescriptor.setDescription("Background color in hex format (e.g., #FFFFFF)");
+		bgColorDescriptor.setDescription("Background color (click to open color dialog)");
 
 		return new IPropertyDescriptor[] {
 			nameDescriptor,
@@ -74,7 +75,7 @@ public class LvglScreenPropertySource implements IPropertySource {
 		case PROPERTY_HEIGHT:
 			return String.valueOf(screen.getHeight());
 		case PROPERTY_BG_COLOR:
-			return PropertyUtils.formatColor(screen.getBgColor());
+			return ColorPropertyDescriptor.intToRgb(screen.getBgColor());
 		default:
 			return null;
 		}
@@ -107,25 +108,26 @@ public class LvglScreenPropertySource implements IPropertySource {
 
 	@Override
 	public void setPropertyValue(Object id, Object value) {
-		String strValue = (String) value;
 		switch ((String) id) {
 		case PROPERTY_NAME:
-			screen.setName(strValue);
+			screen.setName((String) value);
 			break;
 		case PROPERTY_WIDTH:
-			int width = PropertyUtils.parseInt(strValue, screen.getWidth());
+			int width = PropertyUtils.parseInt((String) value, screen.getWidth());
 			if (width > 0) {
 				screen.setWidth(width);
 			}
 			break;
 		case PROPERTY_HEIGHT:
-			int height = PropertyUtils.parseInt(strValue, screen.getHeight());
+			int height = PropertyUtils.parseInt((String) value, screen.getHeight());
 			if (height > 0) {
 				screen.setHeight(height);
 			}
 			break;
 		case PROPERTY_BG_COLOR:
-			screen.setBgColor(PropertyUtils.parseColor(strValue));
+			if (value instanceof RGB) {
+				screen.setBgColor(ColorPropertyDescriptor.rgbToInt((RGB) value));
+			}
 			break;
 		default:
 			break;

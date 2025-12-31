@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 import com.tlcsdm.eclipse.gefemf.demo.model.LvglWidget;
+import com.tlcsdm.eclipse.gefemf.demo.property.FilePropertyDescriptor;
 
 /**
  * Property provider for Image widgets.
- * Handles the imageSource property.
+ * Handles the imageSource property with a file dialog for selecting images.
  */
 public class ImagePropertyProvider implements WidgetPropertyProvider {
 
@@ -32,9 +32,9 @@ public class ImagePropertyProvider implements WidgetPropertyProvider {
 	public List<IPropertyDescriptor> getPropertyDescriptors(LvglWidget widget) {
 		List<IPropertyDescriptor> descriptors = new ArrayList<>();
 
-		TextPropertyDescriptor imageSourceDescriptor = new TextPropertyDescriptor(PROPERTY_IMAGE_SOURCE, "Image Source");
+		FilePropertyDescriptor imageSourceDescriptor = new FilePropertyDescriptor(PROPERTY_IMAGE_SOURCE, "Image Source");
 		imageSourceDescriptor.setCategory(CATEGORY_IMAGE);
-		imageSourceDescriptor.setDescription("URL or path to the image resource (e.g., &image_name or path/to/image.png)");
+		imageSourceDescriptor.setDescription("Click to open file dialog and select an image (relative path will be used)");
 		descriptors.add(imageSourceDescriptor);
 
 		return descriptors;

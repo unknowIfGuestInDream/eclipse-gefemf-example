@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
@@ -26,9 +27,8 @@ import org.eclipse.swt.widgets.Shell;
  * This extends DialogCellEditor to provide a better visual representation
  * of the current color with a color swatch.
  * <p>
- * Note: The ColorDialog position is controlled by the operating system's window manager
- * in SWT. While we cannot directly position the dialog near the cell, this implementation
- * provides a better visual experience with a color swatch preview.
+ * The color dialog is positioned near the current cursor location for better
+ * user experience, providing easier access to the color picker.
  * </p>
  */
 public class PositionedColorCellEditor extends DialogCellEditor {
@@ -135,9 +135,13 @@ public class PositionedColorCellEditor extends DialogCellEditor {
 
 	@Override
 	protected Object openDialogBox(Control cellEditorWindow) {
-		// Create the color dialog
-		Shell parentShell = cellEditorWindow.getShell();
-		ColorDialog dialog = new ColorDialog(parentShell, SWT.NONE);
+		// Create a positioned shell near the cursor location for the color dialog
+		final Display display = cellEditorWindow.getDisplay();
+		final Shell centerShell = new Shell(cellEditorWindow.getShell(), SWT.NO_TRIM);
+		centerShell.setLocation(display.getCursorLocation());
+		
+		// Create the color dialog with the positioned shell as parent
+		ColorDialog dialog = new ColorDialog(centerShell, SWT.NONE);
 
 		// Set the current RGB value
 		Object value = getValue();
@@ -146,9 +150,8 @@ public class PositionedColorCellEditor extends DialogCellEditor {
 		}
 
 		// Open the dialog and return the result
-		// Note: ColorDialog position cannot be controlled in SWT as it's a native dialog.
-		// The OS determines where the dialog appears.
 		RGB result = dialog.open();
+		centerShell.dispose();
 		return result;
 	}
 
