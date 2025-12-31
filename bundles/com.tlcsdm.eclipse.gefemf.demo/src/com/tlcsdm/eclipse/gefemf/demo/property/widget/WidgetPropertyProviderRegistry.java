@@ -76,9 +76,10 @@ public class WidgetPropertyProviderRegistry {
 	 * Register the default widget property providers.
 	 */
 	private void registerDefaultProviders() {
-		// Register checkbox/switch providers
+		// Register checkbox/switch/LED providers (widgets with on/off state)
 		registerProvider(new CheckboxPropertyProvider(LvglWidget.WidgetType.CHECKBOX));
 		registerProvider(new CheckboxPropertyProvider(LvglWidget.WidgetType.SWITCH));
+		registerProvider(new CheckboxPropertyProvider(LvglWidget.WidgetType.LED));
 
 		// Register value-based providers (Slider, Arc, Bar)
 		registerProvider(new ValuePropertyProvider(LvglWidget.WidgetType.SLIDER));

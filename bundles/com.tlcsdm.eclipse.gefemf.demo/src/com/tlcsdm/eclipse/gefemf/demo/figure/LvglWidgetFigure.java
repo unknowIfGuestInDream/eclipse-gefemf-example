@@ -453,15 +453,17 @@ public class LvglWidgetFigure extends Figure {
 
 	private void drawLed(Graphics g, Rectangle r) {
 		// Draw an LVGL-style LED widget
+		// LED uses the 'checked' property to represent on/off state (like LVGL lv_led_on/off)
 		int size = Math.min(r.width - 6, r.height - 6);
 		int centerX = r.x + r.width / 2;
 		int centerY = r.y + r.height / 2;
 		
 		// Draw LED body (circular with gradient-like effect)
+		// Green when on (checked=true), dark gray when off (checked=false)
 		g.setBackgroundColor(checked ? ColorConstants.green : ColorConstants.darkGray);
 		g.fillOval(centerX - size / 2, centerY - size / 2, size, size);
 		
-		// Draw highlight for 3D effect
+		// Draw highlight for 3D effect when LED is on
 		if (checked) {
 			g.setBackgroundColor(ColorConstants.lightGreen);
 			g.fillOval(centerX - size / 4, centerY - size / 4, size / 3, size / 3);

@@ -48,13 +48,8 @@ public class CheckboxCellEditor extends CellEditor {
 		checkbox = new Button(parent, SWT.CHECK);
 		checkbox.setBackground(parent.getBackground());
 		checkbox.addListener(SWT.Selection, e -> {
-			boolean newValue = checkbox.getSelection();
-			boolean oldValue = doGetValue() != null ? (Boolean) doGetValue() : false;
-			if (newValue != oldValue) {
-				markDirty();
-				doSetValue(Boolean.valueOf(newValue));
-				fireApplyEditorValue();
-			}
+			markDirty();
+			fireApplyEditorValue();
 		});
 		return checkbox;
 	}
